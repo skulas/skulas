@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { HEROES } from './../moc-heroes';
 import { Hero } from './../hero';
-import {NgModel} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   // the component's CSS element selector
@@ -12,13 +12,19 @@ import {NgModel} from '@angular/forms';
 })
 export class HeroesComponent implements OnInit {
   hero: Hero = {
-    id : 1,
-    name : 'Tito Gomez'
+    id: 1,
+    name: 'Tito Gomez'
   };
+  selectedHero: Hero;
+  heroes = HEROES;
 
   constructor() { }
 
   ngOnInit() {
+    this.heroes.push(this.hero);
   }
 
+  onSelect(hero: Hero): void {
+    this.selectedHero = hero;
+  }
 }

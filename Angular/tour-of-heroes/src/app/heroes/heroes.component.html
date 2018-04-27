@@ -1,7 +1,31 @@
 <h2>{{hero.name}} Details</h2>
-<div><span style="font-style:italic">id: </span>{{hero.id | currency : "INR"}}</div>
 <div>
+    <span style="font-style:italic">id: </span>{{hero.id | currency : "INR"}}
+</div>
+
+<div *ngIf="selectedHero">
+    <h2>{{selectedHero.name | uppercase}} Details</h2>
+    <div>
+        <span>id: </span>{{selectedHero.id}}
+    </div>
+    <div>
+        <label>
+            name:
+            <input [(ngModel)]="selectedHero.name" placeholder="Name">
+        </label>
+    </div>
+</div>
+
+<div>
+    <h2>My Heroes</h2>
     <label style='font-style:oblique'>Name:
-    <input type="text" [(ngModel)]="hero.name" placeholder="Name">
+        <input type="text" [(ngModel)]="hero.name" placeholder="Name">
     </label>
+
+    <ul class='heroes'>
+        <!--Unsorted List-->
+        <li *ngFor="let hero_i of heroes" (click)="onSelect(hero_i)" [class.selected]="hero_i === selectedHero">
+            <span class='badge'>{{hero_i.id}}</span> {{hero_i.name}}
+        </li>
+    </ul>
 </div>
