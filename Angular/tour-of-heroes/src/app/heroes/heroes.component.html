@@ -1,3 +1,7 @@
-<p>
-  heroes works!
-</p>
+<h2>{{hero.name}} Details</h2>
+<div><span style="font-style:italic">id: </span>{{hero.id | currency : "INR"}}</div>
+<div>
+    <label style='font-style:oblique'>Name:
+    <input type="text" [(ngModel)]="hero.name" placeholder="Name">
+    </label>
+</div>
