@@ -25,6 +25,10 @@ export class HeroesComponent implements OnInit {
   }
 
   onSelect(hero: Hero): void {
-    this.selectedHero = hero;
+    if (this.selectedHero === hero) {
+      this.selectedHero = null;
+    } else {
+      this.selectedHero = hero;
+    }
   }
 }
