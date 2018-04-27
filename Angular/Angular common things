@@ -1,0 +1,7 @@
+# Creaate New Project. ** It creates a new folder my-app **
+ng new my-app
+
+# Run angular project
+cd my-app
+ng serve --open
+
