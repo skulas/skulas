@@ -1,9 +1,10 @@
 Office Add-In:
 
-1. Sync issue that works only on debug mode
-2. Get all slices into single bityarray before transmit
+. Sync issue. Upload works only on debug mode
+. Get all slices into single bytearray before transmit
 (look here for idea: https://stackoverflow.com/questions/39695223/how-to-upload-a-local-word-docx-file-on-server-using-javascript)
-3. Do Post from form with input of type file (after fix of host: 0.0.0.0)
-Thend do multipart upload instead post of bytearray
-4. Fix filename through http headers if form / action post fails.
+. Fix filename through http headers if working with bytearray
+. Fix crash after upload complete
 
+. Do Post from form with input of type file (after fix of host: 0.0.0.0)
+Then do multipart upload instead post of bytearray
