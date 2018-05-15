@@ -131,7 +131,8 @@
             // request.setRequestHeader('Accept-Encoding', 'gzip, deflate');
             // request.setRequestHeader('Content-Length', slice.size);
             
-            request.open("POST", "https://localhost:44300/api/values/5", false);//false->sync
+            request.open("POST", "https://10.0.0.103:44300/api/values/5", false);//false->sync
+            // request.open("POST", "https://localhost:44300/api/values/5", false);//false->sync
     
             // Send the file as the body of an HTTP POST 
             // request to the web server.
