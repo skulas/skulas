@@ -1,0 +1,70 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license. -->
+<!-- See LICENSE in the project root for license information -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ezke_Excellinio</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.debug.js"></script>
+    <!-- <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.debug.js"></script> -->
+    <!-- <script src="src/GetDoc.js"></script> -->
+
+    <!-- LOCAL -->
+    <link rel="stylesheet" href="node_modules/office-ui-fabric-js/dist/css/fabric.min.css" />
+    <link rel="stylesheet" href="node_modules/office-ui-fabric-js/dist/css/fabric.components.css" />
+
+    <!-- CDN -->
+    <!-- For the Office UI Fabric, go to http://aka.ms/office-ui-fabric to learn more. -->
+    <!--<link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.2.0/css/fabric.min.css" />-->
+    <!--<link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.2.0/css/fabric.components.min.css" />-->
+
+    <!-- Template styles -->
+    <link href="app.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-font-m ms-welcome">
+    <header class="ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500">
+        <div id="content-header">
+            <div class="padding">
+                <h1>Welcome to EXCEL Uploader</h1>
+            </div>
+        </div>
+    </header>
+    <div id="content-main">
+        <div class="padding">
+            <p>Choose the button below to set the color of the selected range to green.</p>
+            <br />
+            <h3>Try it out</h3>
+            <button class="ms-Button" id="set-color">Set color</button>
+        </div>
+        <!-- <form name="upload-form" id='upload-form' class="padding" method="POST" enctype="multipart/form-data" action="http://localhost:63344/api/values"> -->
+        <form name="upload-form" id='upload-form' class="padding">
+            <h1>Upload Sheet</h1>
+            <br />
+            <div>
+                <label for="officeFile">Office Flie</label>
+                <input id="officeFile" type="file" />
+            </div>
+            <div>
+                <input id="submit" type="submit" value="Upload" />
+            </div>
+            <br />
+            <div>
+                <h2>Status</h2>
+                <div id="status"></div>
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="node_modules/office-ui-fabric-js/dist/js/fabric.js"></script>
+
+</body>
+
+</html>

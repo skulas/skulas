@@ -1,0 +1,6 @@
+Office_DEV/office_server/node_modules/
+Office_DEV/office_uploads_server/office_uploads/bin/
+Office_DEV/office_uploads_server/office_uploads/obj/
+Office_DEV/office_uploads_server/.vs/
+Office_DEV/office_uploads_server/office_uploads/App_Data/uploads/
+Office_DEV/office_server/.vscode/
