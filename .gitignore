@@ -4,3 +4,6 @@ Office_DEV/office_uploads_server/office_uploads/obj/
 Office_DEV/office_uploads_server/.vs/
 Office_DEV/office_uploads_server/office_uploads/App_Data/uploads/
 Office_DEV/office_server/.vscode/
+Vue/flaskvue/backend/venv/
+Vue/flaskvue/dist/
+Vue/flaskvue/frontend/node_modules/
