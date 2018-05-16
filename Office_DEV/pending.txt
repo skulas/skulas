@@ -8,3 +8,16 @@ Office Add-In:
 
 . Do Post from form with input of type file (after fix of host: 0.0.0.0)
 Then do multipart upload instead post of bytearray
+
+
+
+Response should log all files uploaded
+
+
+Tests:
+1. No file / blank file / new file
+2. Word and Excel
+3. Upload same file / file with same name many times.
+4. Test large files
+5. Unsaved changes. NEED TO DEFINE BEHAVIOR.
+
