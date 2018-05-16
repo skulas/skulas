@@ -10,8 +10,22 @@ Office Add-In:
 Then do multipart upload instead post of bytearray
 
 
-
 Response should log all files uploaded
+
+Check if office addin has key store (remembers username password)
+Check if office plugin host and edge share the same key store (or password store) - 
+
+
+VSTO
+. On VSTO Application Add-In crashes when saving excel for the first time.
+
+
+
+Flow:
+1. User logs in and gets token.
+2. Upload is done with token.
+
+
 
 
 Tests:
