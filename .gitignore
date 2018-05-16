@@ -9,3 +9,5 @@ Vue/flaskvue/dist/
 Vue/flaskvue/frontend/node_modules/
 Office_DEV/Excel_VSTO_AddIn/Excel_VSTO_AddIn/.vs/
 Office_DEV/Excel_VSTO_AddIn/Excel_VSTO_AddIn/obj/
+Office_DEV/Excel_VSTO_AddIn/Excel_VSTO_AddIn/bin/
+Office_DEV/Excel_VSTO_AddIn/Excel_VSTO_AddIn/packages/

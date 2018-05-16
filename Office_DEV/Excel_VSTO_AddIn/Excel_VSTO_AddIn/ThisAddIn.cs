@@ -7,8 +7,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System.IO;
+
 // https://msdn.microsoft.com/en-us/library/cc668205.aspx
 
 namespace Excel_VSTO_AddIn
@@ -31,15 +30,18 @@ namespace Excel_VSTO_AddIn
             firstRow.EntireRow.Insert(Excel.XlInsertShiftDirection.xlShiftDown);
             Excel.Range newFirstRow = activeWorksheet.get_Range("A1");
             var currPath = Wb.Path;
-            if (String.IsNullOrEmpty(currPath)) return;
+            if (String.IsNullOrEmpty(currPath))
+            {
+                var login = new UserControlLogin();
+                var loginCustomPane = this.CustomTaskPanes.Add(login, "Login To Dokka");
+                loginCustomPane.Visible = true;
+                return;
+            }
             var task = new Task(async () =>
             {
                 Task.Delay(2000).Wait();
                 newFirstRow.Value2 = "Uploading the file";
-
-                HttpClient httpClient = new HttpClient();
-                MultipartFormDataContent form = new MultipartFormDataContent();
-
+ 
                 var wbPath = Wb.Path;
                 var wbFulName = Wb.FullName;
                 var name = Wb.Name;
@@ -48,11 +50,10 @@ namespace Excel_VSTO_AddIn
                 //form.Add(new StringContent(username), "username");
                 //form.Add(new StringContent(useremail), "email");
                 //form.Add(new StringContent(password), "password");
-                var fileBytes = File.ReadAllBytes(newName);
-                form.Add(new ByteArrayContent(fileBytes, 0, fileBytes.Length), "office_file", name);
-                HttpResponseMessage response = await httpClient.PostAsync("https://localhost:44300/api/values", form);
-                var content = response.Content;
 
+                await ServerInterface.Instance.UploadFileAtPath(newName, name);
+
+                // Delete the file some day, should add callback to upload for that.
             });
             task.Start();
         }
