@@ -9,6 +9,7 @@ using Microsoft.Office.Tools.Excel;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.IO;
+// https://msdn.microsoft.com/en-us/library/cc668205.aspx
 
 namespace Excel_VSTO_AddIn
 {
