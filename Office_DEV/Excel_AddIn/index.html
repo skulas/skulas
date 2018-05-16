@@ -43,13 +43,13 @@
             <h3>Try it out</h3>
             <button class="ms-Button" id="set-color">Set color</button>
         </div>
-        <!-- <form name="upload-form" id='upload-form' class="padding" method="POST" enctype="multipart/form-data" action="http://localhost:63344/api/values"> -->
-        <form name="upload-form" id='upload-form' class="padding">
+        <form name="upload-form" id='upload-form' class="padding" method="POST" enctype="multipart/form-data" action="http://localhost:63344/api/values">
+        <!-- <form name="upload-form" id='upload-form' class="padding"> -->
             <h1>Upload Sheet</h1>
             <br />
             <div>
                 <label for="officeFile">Office Flie</label>
-                <input id="officeFile" type="file" />
+                <input id="officeFile" name="officeFile" type="file" />
             </div>
             <div>
                 <input id="submit" type="submit" value="Upload" />

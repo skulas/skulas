@@ -7,7 +7,7 @@
     Office.initialize = function (reason) {
         $(document).ready(function () {
             $('#set-color').click(setColor);
-            $('#submit').click(sendFile);
+            // $('#submit').click(sendFile);
             // debugger;
             var stat = document.getElementById("status");
             stat.innerHTML = ":";

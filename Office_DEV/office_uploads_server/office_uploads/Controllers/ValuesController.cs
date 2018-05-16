@@ -43,8 +43,8 @@ namespace office_uploads.Controllers
         //{
         //    string strb = $"You sent me {value}. You can keep it";
         //}
-        public async Task<HttpResponseMessage> Put()
-        //public async Task<HttpResponseMessage> Post()
+        //public async Task<HttpResponseMessage> Put()
+        public async Task<HttpResponseMessage> Post()
         {
             // Check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent())
@@ -52,8 +52,9 @@ namespace office_uploads.Controllers
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            string root = HttpContext.Current.Server.MapPath("~/App_Data/uploads");
+            string root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/uploads");
             var provider = new CustomMultipartFormDataStreamProvider(root);
+
             var props = Request.Properties;
             var rqStr = Request.ToString();
             Trace.WriteLine("Request:");
@@ -77,46 +78,37 @@ namespace office_uploads.Controllers
 
             try
             {
-                var tito = await Request.Content.ReadAsByteArrayAsync();
-                Trace.WriteLine($"Received {tito.Length} bytes");
-
-                return Request.CreateResponse(HttpStatusCode.OK);
-            } catch (Exception e)
+                // Read the form data.
+                await Request.Content.ReadAsMultipartAsync(provider);
+                string filename = "NONE";
+                // This illustrates how to get the file names.
+                foreach (MultipartFileData file in provider.FileData)
+                {
+                    filename = provider.GetLocalFileName(file.Headers);
+                    Trace.WriteLine(file.Headers.ContentDisposition.FileName);
+                    Trace.WriteLine("Server file path: " + file.LocalFileName);
+                }
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent($"File uploaded: {Path.GetFileName(filename)}");
+                return response;
+            }
+            catch (System.Exception e)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-            
-
-            //try
-            //{
-            //    // Read the form data.
-            //    await Request.Content.ReadAsMultipartAsync(provider);
-
-            //    // This illustrates how to get the file names.
-            //    foreach (MultipartFileData file in provider.FileData)
-            //    {
-            //        Trace.WriteLine(file.Headers.ContentDisposition.FileName);
-            //        Trace.WriteLine("Server file path: " + file.LocalFileName);
-            //    }
-            //    return Request.CreateResponse(HttpStatusCode.OK);
-            //}
-            //catch (System.Exception e)
-            //{
-            //    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-            //}
 
 
 
 
-            /////////////////////
+            ///////////////////
             //HttpRequestMessage request = this.Request;
             //if (!request.Content.IsMimeMultipartContent())
             //{
-            //    throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            //    //throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            //    Trace.WriteLine("ERROR: Unsupoerted Media TYpe");
+            //    return Request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, new HttpResponseException(HttpStatusCode.UnsupportedMediaType));
             //}
 
-            //string root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/uploads");
-            //var provider = new MultipartFormDataStreamProvider(root);
 
             //var task = request.Content.ReadAsMultipartAsync(provider).
             //    ContinueWith<HttpResponseMessage>(o =>
@@ -128,6 +120,7 @@ namespace office_uploads.Controllers
             //        if (firstFile != null)
             //        {
             //            filename = firstFile.Headers.ContentDisposition.FileName;
+            //            Trace.WriteLine($"Uploaded: {filename}.");
             //        }
             //        // this is the file name on the server where the file was saved 
 
@@ -137,12 +130,12 @@ namespace office_uploads.Controllers
             //        };
             //    }
             //);
-            //return task;
+            //await task;
         }
 
         // PUT api/values/5
-//        public void Put(int id, [FromBody]string value)
-        public async Task<HttpResponseMessage> Post()
+        public async Task<HttpResponseMessage> Put(/*int id, [FromBody]string value*/)
+        //public async Task<HttpResponseMessage> Post()
         {
             string root = HttpContext.Current.Server.MapPath("~/App_Data/uploads");
             var props = Request.Properties;
