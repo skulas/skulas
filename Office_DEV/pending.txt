@@ -17,14 +17,19 @@ Check if office plugin host and edge share the same key store (or password store
 
 
 VSTO
-. On VSTO Application Add-In crashes when saving excel for the first time.
-
-
 
 Flow:
 1. User logs in and gets token.
 2. Upload is done with token.
+3. SHALL DO UPLOAD AFTER LOGIN?? CURRENTLY DOES OR LOGIN OR UPLOAD UPPON SAVE.
+4. Need to persist username/password. No built in solution in windows such as keychain in mac.
+5. Need to define together with Arik / Emil a way to validate file-token vs file-name vs client. 
+	This way users cannot just edit the filename and upload another file just because it matches the regexp
+6. *** MUST ***: Remove extra row added uppon upload for debug
 
+
+File Format:
+Dokka#managed#file_mashebali_0123456789_configString
 
 
 
@@ -34,4 +39,5 @@ Tests:
 3. Upload same file / file with same name many times.
 4. Test large files
 5. Unsaved changes. NEED TO DEFINE BEHAVIOR.
-
+6. Save uppon close app, check if upload succeeds
+7. Check files with different names and valid and not valid dokka format.

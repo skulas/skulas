@@ -13,23 +13,30 @@ namespace Excel_VSTO_AddIn
 {
     public partial class UserControlLogin : UserControl
     {
-        public UserControlLogin()
-        {
+        //private Action<string, string> _loginAction;
+        public Action<string, string> LoginAction { get; set; } = null;
+
+        public string LoginStatusMessage { get {
+                return lblLoginStatus.Text;
+            }
+            set {
+                lblLoginStatus.Text = value;
+            }
+        }
+
+        public UserControlLogin() {
             InitializeComponent();
         }
 
-        private async void btnLogin_Click(object sender, EventArgs e)
+        public UserControlLogin(Action<string, string> loginAction)
         {
-            await ServerInterface.Instance.LoginWithCredentials(fldUsername.Text, fldPwd.Text, (succss) =>
-            {
-                if (succss)
-                {
-                    Trace.WriteLine("Successfull login");
-                } else
-                {
-                    Trace.WriteLine("Login failed");
-                }
-            });
+            LoginAction = loginAction;
+            InitializeComponent();
+        }
+
+        private void BtnLogin_Click(object sender, EventArgs e)
+        {
+            LoginAction?.Invoke(fldUsername.Text, fldPwd.Text);
         }
     }
 }

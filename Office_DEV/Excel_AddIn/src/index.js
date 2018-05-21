@@ -41,6 +41,7 @@
     function sendFile() {
         var testDoc = Office.context.document;
         debugger;
+        Office.context.document.addHandlerAsync(Office.EventType.)
         Office.context.document.getFileAsync(Office.FileType.Compressed,
            { sliceSize: 4194304 },
             function (result) {

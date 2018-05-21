@@ -7,6 +7,10 @@ using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Threading;
+using System.Windows.Forms;
 
 // https://msdn.microsoft.com/en-us/library/cc668205.aspx
 
@@ -14,9 +18,26 @@ namespace Excel_VSTO_AddIn
 {
     public partial class ThisAddIn
     {
+        private const string DOKKA_PREFIX = "Dokka#managed#file";
+        //private const string FILENAME_FREE_PART = "FREE_STRING"; // Any string
+        //private const string CUSTOMER_REF_PART = "0000000000"; // 10 hexadecimal digits
+        //private const string FILE_EXTNESION_PART = "FILE_EXTENSION";
+        //private const string FILE_CONFIG_PART = "FILE_CONFIG_PARRT"; // Any string
+        //private string FILENAME_PROTO = $"{DOKKA_PREFIX}_{FILENAME_FREE_PART}_{CUSTOMER_REF_PART}_{FILE_CONFIG_PART}.{FILE_EXTNESION_PART}";
+        Microsoft.Office.Tools.CustomTaskPane _loginPane = null;
+        UserControlLogin _loginCtrl = null;
+        // NOTE: This regexp doesn't allow spaces in the filename. Fix needed if requirements allow space in filename.
+        private string _filenameRegexPattern = $"{DOKKA_PREFIX}_.*_{"[a-fA-F0-9]{10}"}_.*\\..*";
+        
+        Thread _mainThread = Thread.CurrentThread;
+
+        public SynchronizationContext TheWindowsFormsSynchronizationContext { get; private set; }
+
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            this.Application.WorkbookBeforeSave += new Microsoft.Office.Interop.Excel.AppEvents_WorkbookBeforeSaveEventHandler(Application_WorkbookBeforeSave);
+            TheWindowsFormsSynchronizationContext = WindowsFormsSynchronizationContext.Current
+                                           ?? new WindowsFormsSynchronizationContext();
+            Application.WorkbookBeforeSave += new Microsoft.Office.Interop.Excel.AppEvents_WorkbookBeforeSaveEventHandler(Application_WorkbookBeforeSave);
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
@@ -32,11 +53,18 @@ namespace Excel_VSTO_AddIn
             var currPath = Wb.Path;
             if (String.IsNullOrEmpty(currPath))
             {
-                var login = new UserControlLogin();
-                var loginCustomPane = this.CustomTaskPanes.Add(login, "Login To Dokka");
-                loginCustomPane.Visible = true;
+                Trace.WriteLine("Ignoring save of new file");
+
                 return;
             }
+
+            if (!IsDokkaManagedFilename(Wb.Name))
+            {
+                Trace.WriteLine($"Filename {Wb.Name} is not recognized as a Dokka managed filename");
+
+                return;
+            }
+
             var task = new Task(async () =>
             {
                 Task.Delay(2000).Wait();
@@ -51,7 +79,14 @@ namespace Excel_VSTO_AddIn
                 //form.Add(new StringContent(useremail), "email");
                 //form.Add(new StringContent(password), "password");
 
-                await ServerInterface.Instance.UploadFileAtPath(newName, name);
+                try
+                {
+                    await ServerInterface.Instance.UploadFileAtPath(newName, name, ShowLoginWrapper, UploadResultHandler);
+                } catch (Exception ex)
+                {
+                    Trace.WriteLine($"Failure attempting to upload file: {ex.Message}\n{ex.InnerException?.Message??""}");
+                }
+                
 
                 // Delete the file some day, should add callback to upload for that.
             });
@@ -69,7 +104,84 @@ namespace Excel_VSTO_AddIn
             this.Startup += new System.EventHandler(ThisAddIn_Startup);
             this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
         }
-        
+
         #endregion
+
+
+
+        #region Utils and Logic
+
+        private async void LoginActionCallback(string username, string password)
+        {
+
+            await ServerInterface.Instance.LoginWithCredentials(username, password, (succss) =>
+            {
+                if (succss)
+                {
+                    Trace.WriteLine("Successfull login");
+                    HideLogin();
+                }
+                else
+                {
+                    Trace.WriteLine("Login failed");
+                    ShowLogin("Login Failure. Please try again");
+                }
+            });
+        }
+
+        private void UploadResultHandler(string result)
+        {
+            Trace.WriteLine($"Upload ended: {result}");
+        }
+
+        private void ShowLoginWrapper(string message)
+        {
+            // When invoked as a delegate function, use this wrapper for future changes.
+            ShowLogin(message);
+        }
+
+        private void ShowLogin(string message = "")
+        {
+            if (_loginPane == null)
+            {
+                TheWindowsFormsSynchronizationContext.Send(d =>
+                {
+                    CreateLogin();
+                }, null);
+            }
+            else
+            {
+                TheWindowsFormsSynchronizationContext.Send(d =>
+                {
+                    _loginCtrl.LoginStatusMessage = message;
+                    _loginPane.Visible = true;
+                }, null);
+            }
+        }
+
+        private void HideLogin()
+        {
+            TheWindowsFormsSynchronizationContext.Send(d =>
+            {
+                _loginCtrl.LoginStatusMessage = "";
+                _loginPane.Visible = false;
+            }, null);
+        }
+
+        private void CreateLogin()
+        {
+            _loginCtrl = new UserControlLogin(LoginActionCallback);
+            _loginPane = this.CustomTaskPanes.Add(_loginCtrl, "Login To Dokka");
+            _loginPane.Visible = true;
+        }
+
+        private bool IsDokkaManagedFilename(string filename)
+        {
+            var isDokkaFilename = Regex.IsMatch(filename, _filenameRegexPattern);
+
+            return isDokkaFilename;
+        }
+
+        #endregion Utils and Logic
     }
 }

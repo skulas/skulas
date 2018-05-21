@@ -33,6 +33,7 @@
             this.fldUsername = new System.Windows.Forms.TextBox();
             this.fldPwd = new System.Windows.Forms.TextBox();
             this.btnLogin = new System.Windows.Forms.Button();
+            this.lblLoginStatus = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label2
@@ -47,7 +48,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(59, 83);
+            this.label3.Location = new System.Drawing.Point(59, 79);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(52, 13);
             this.label3.TabIndex = 2;
@@ -62,7 +63,7 @@
             // 
             // fldPwd
             // 
-            this.fldPwd.Location = new System.Drawing.Point(8, 99);
+            this.fldPwd.Location = new System.Drawing.Point(8, 95);
             this.fldPwd.Name = "fldPwd";
             this.fldPwd.Size = new System.Drawing.Size(155, 20);
             this.fldPwd.TabIndex = 4;
@@ -76,12 +77,21 @@
             this.btnLogin.TabIndex = 5;
             this.btnLogin.Text = "GO";
             this.btnLogin.UseVisualStyleBackColor = true;
-            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            this.btnLogin.Click += new System.EventHandler(this.BtnLogin_Click);
+            // 
+            // lblLoginStatus
+            // 
+            this.lblLoginStatus.AutoSize = true;
+            this.lblLoginStatus.Location = new System.Drawing.Point(5, 131);
+            this.lblLoginStatus.Name = "lblLoginStatus";
+            this.lblLoginStatus.Size = new System.Drawing.Size(0, 13);
+            this.lblLoginStatus.TabIndex = 6;
             // 
             // UserControlLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblLoginStatus);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.fldPwd);
             this.Controls.Add(this.fldUsername);
@@ -100,5 +110,6 @@
         private System.Windows.Forms.TextBox fldUsername;
         private System.Windows.Forms.TextBox fldPwd;
         private System.Windows.Forms.Button btnLogin;
+        private System.Windows.Forms.Label lblLoginStatus;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,8 @@ namespace office_uploads.Controllers
 {
     public class LoginController : ApiController
     {
+        public string DummyTokenForTesting { get; set; } = "FFF000FFF0";
+
         // GET: api/Login
         public IEnumerable<string> Get()
         {
@@ -27,9 +30,28 @@ namespace office_uploads.Controllers
         {
             var requestStr = Request.Content.ToString();
             // Dictionary<string, string> requestDic;
-            var result = await Request.Content.ReadAsFormDataAsync();
-            var response = Request.CreateResponse(HttpStatusCode.OK, "Great Success");
-            response.Content = new StringContent("{ success:true }");
+            var requestContent = await Request.Content.ReadAsFormDataAsync();
+            var username = requestContent["username"];
+            var pwd = requestContent["password"];
+            bool loginResult = false;
+            string loginMessage = "Bad Login. Use u:aaa  p:zzz to login";
+            if (username.Equals("aaa") && pwd.Equals("zzz"))
+            {
+                loginResult = true;
+                loginMessage = "Great Success";
+            }
+
+            var response = Request.CreateResponse(HttpStatusCode.OK, loginMessage);
+
+            Dictionary<string, string> resultDic = new Dictionary<string, string>()
+            {
+                {"success", loginResult.ToString() },
+                {"details", loginMessage },
+                {"login-token", (loginResult ? DummyTokenForTesting : "") },
+                {"file-token", "bad1234dad" }
+            };
+            
+            response.Content = new StringContent(JsonConvert.SerializeObject(resultDic));
 
             //var responseTask = new Task(() =>
             //{
