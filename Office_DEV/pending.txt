@@ -26,6 +26,9 @@ Flow:
 5. Need to define together with Arik / Emil a way to validate file-token vs file-name vs client. 
 	This way users cannot just edit the filename and upload another file just because it matches the regexp
 6. *** MUST ***: Remove extra row added uppon upload for debug
+7. Need to login again if Token expired.
+8. Perist Token between Excel executions??
+9. Implement same for Word. MINIMAL boilerplate.
 
 
 File Format:
