@@ -23,7 +23,10 @@ namespace Excel_VSTO_AddIn
 
         private ServerInterface()
         {
-            
+            if (!String.IsNullOrEmpty(Properties.Settings.Default.loginToken))
+            {
+                _dokkaServerToken = Properties.Settings.Default.loginToken;
+            }
         }
 
         public static ServerInterface Instance
@@ -38,12 +41,12 @@ namespace Excel_VSTO_AddIn
             }
         }
 
-        public async Task UploadFileAtPath(string filePath, string fileName, Action<string> showLoginFunc, Action<string>uploadResultHandler)
+        public async Task UploadFileAtPath(string filePath, string fileName, Action<string> showLoginFunc, Action<string, bool>uploadResultHandler)
         {
             if (String.IsNullOrEmpty(_dokkaServerToken))
             {
                 Trace.WriteLine("User must login first");
-                showLoginFunc("Login required to upload file to Dokka");
+                showLoginFunc("Login required to upload a file to Dokka");
 
                 return;
             }
@@ -56,11 +59,27 @@ namespace Excel_VSTO_AddIn
             var fileBytes = File.ReadAllBytes(filePath);
             form.Add(new ByteArrayContent(fileBytes, 0, fileBytes.Length), "office_file", fileName);
             HttpResponseMessage response = await httpClient.PostAsync($"{_serverRoot}/values", form);
+
+            if (response == null)
+            {
+                Trace.WriteLine("Response is null. CHECK, this should not happen");
+                uploadResultHandler(null, false);
+
+                return;
+            } else if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Trace.WriteLine($"There was an error when uploading file. CODE: {response.StatusCode}");
+                bool showLogin = (response.StatusCode == System.Net.HttpStatusCode.Unauthorized);
+
+                uploadResultHandler(null, showLogin);
+
+                return;
+            }
             var content = await response.Content.ReadAsStringAsync(); // check in the future if we want to implement a callback to the addin once upload is done / failed
-            uploadResultHandler(content);
+            uploadResultHandler(content, false);
         }
 
-        public async Task LoginWithCredentials(string username, string password, Action<bool> loginCallback)
+        public async Task LoginWithCredentials(string username, string password, Action<bool, string> loginCallback)
         {
             HttpClient httpClient = new HttpClient();
             Dictionary<string, string> loginDic = new Dictionary<string, string>
@@ -79,7 +98,7 @@ namespace Excel_VSTO_AddIn
             } catch (Exception ex)
             {
                 Trace.WriteLine($"Error when doing login: {ex.Message}\n{ex.InnerException?.Message ?? ""}");
-                loginCallback(false);
+                loginCallback(false, null);
 
                 return;
             }
@@ -87,19 +106,20 @@ namespace Excel_VSTO_AddIn
             if (response == null)
             {
                 Trace.WriteLine("Login failure. Response is null. Super weird");
-                loginCallback(false);
+                loginCallback(false, null);
 
                 return;
             } else if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 Trace.WriteLine($"Login Failure. Got Error {response.StatusCode} from server");
-                loginCallback(false);
+                loginCallback(false, null);
 
                 return;
             }
 
             var content = response.Content;
             var contentStr = await content.ReadAsStringAsync();
+
             var result = (Dictionary<string, string>)JsonConvert.DeserializeObject(contentStr, typeof(Dictionary<string, string>));
             bool loginSuccess = false;
             string loginSuccessStr = $"Parsing Failure. Respose from server: {contentStr}";
@@ -125,12 +145,14 @@ namespace Excel_VSTO_AddIn
             {
                 _dokkaServerToken = loginToken;
                 _fileIdentifier = filenameToken;
+                Properties.Settings.Default.loginToken = _dokkaServerToken;
+                Properties.Settings.Default.Save();
             } else
             {
                 Trace.WriteLine($"Login failed: {result["details"]}");
             }
 
-            loginCallback(loginSuccess);
+            loginCallback(loginSuccess, loginToken);
         }
     }
 }

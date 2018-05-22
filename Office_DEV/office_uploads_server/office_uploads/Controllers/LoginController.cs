@@ -11,7 +11,7 @@ namespace office_uploads.Controllers
 {
     public class LoginController : ApiController
     {
-        public string DummyTokenForTesting { get; set; } = "FFF000FFF0";
+        public static string DummyTokenForTesting { get; set; } = "FFF000FFF2";
 
         // GET: api/Login
         public IEnumerable<string> Get()
@@ -40,8 +40,10 @@ namespace office_uploads.Controllers
                 loginResult = true;
                 loginMessage = "Great Success";
             }
+            HttpStatusCode httpCode = loginResult ? HttpStatusCode.OK : HttpStatusCode.Unauthorized;
 
-            var response = Request.CreateResponse(HttpStatusCode.OK, loginMessage);
+
+            var response = Request.CreateResponse(httpCode, loginMessage);
 
             Dictionary<string, string> resultDic = new Dictionary<string, string>()
             {

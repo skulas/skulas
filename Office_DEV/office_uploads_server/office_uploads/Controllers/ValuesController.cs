@@ -26,16 +26,9 @@ namespace office_uploads.Controllers
 
     public class ValuesController : ApiController
     {
-        // GET api/values
-        public IEnumerable<string> Get()
+        public HttpResponseMessage Get(int id)
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        public string Get(int id)
-        {
-            return $"value: {id}";
+            return Request.CreateErrorResponse(HttpStatusCode.MethodNotAllowed, "GET is not suported");
         }
 
         // POST api/values
@@ -52,6 +45,36 @@ namespace office_uploads.Controllers
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
+            // Validate Token delivered through Authorization header
+            var headers = Request.Headers;
+            string tokenFromClient = null;
+            IEnumerable<string> hedVals = null;
+
+            if (headers.TryGetValues("Authorization", out hedVals))
+            {
+                try
+                {
+                    tokenFromClient = hedVals.First().Split(" ".ToCharArray()).Last();
+                } catch (Exception e)
+                {
+                    Trace.WriteLine($"Failure retreiving token from header. Error: {e.Message}\n{e.InnerException?.Message ?? ""}");
+                }
+            } else
+            {
+                Trace.WriteLine("Header doesn't contain Authentication token, cannot proceed.");
+            }
+
+            if (tokenFromClient == null)
+            {
+                var response = Request.CreateResponse(HttpStatusCode.NonAuthoritativeInformation, "The Authorization header could not be found");
+                return response;
+            } else if (!TokenIsValid(tokenFromClient))
+            {
+                var response = Request.CreateResponse(HttpStatusCode.Unauthorized, $"The token {tokenFromClient} is not a valid token. User should login again.");
+                return response;
+            }
+
+
             string root = System.Web.HttpContext.Current.Server.MapPath("~/App_Data/uploads");
             var provider = new CustomMultipartFormDataStreamProvider(root);
 
@@ -61,7 +84,6 @@ namespace office_uploads.Controllers
             Trace.WriteLine(rqStr);
             Trace.WriteLine("======================");
 
-            var headers = Request.Headers;
             Trace.WriteLine("headers");
             foreach (var header in headers)
             {
@@ -97,9 +119,6 @@ namespace office_uploads.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
 
-
-
-
             ///////////////////
             //HttpRequestMessage request = this.Request;
             //if (!request.Content.IsMimeMultipartContent())
@@ -134,6 +153,7 @@ namespace office_uploads.Controllers
         }
 
         // PUT api/values/5
+        // TODO: Delete the contents and return error PUT not supported (like delete and get)
         public async Task<HttpResponseMessage> Put(/*int id, [FromBody]string value*/)
         //public async Task<HttpResponseMessage> Post()
         {
@@ -174,8 +194,15 @@ namespace office_uploads.Controllers
         }
 
         // DELETE api/values/5
-        public void Delete(int id)
+        public HttpResponseMessage Delete(int id)
         {
+            return Request.CreateErrorResponse(HttpStatusCode.MethodNotAllowed, "Delete is not suported");
+        }
+
+
+        private bool TokenIsValid(string token)
+        {
+            return token.Equals(LoginController.DummyTokenForTesting);
         }
     }
 }

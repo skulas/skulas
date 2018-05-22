@@ -42,6 +42,7 @@ namespace Excel_VSTO_AddIn
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {
+            
         }
 
         private void Application_WorkbookBeforeSave(Microsoft.Office.Interop.Excel.Workbook Wb, bool SaveAsUI, ref bool Cancel)
@@ -114,12 +115,16 @@ namespace Excel_VSTO_AddIn
         private async void LoginActionCallback(string username, string password)
         {
 
-            await ServerInterface.Instance.LoginWithCredentials(username, password, (succss) =>
+            await ServerInterface.Instance.LoginWithCredentials(username, password, (succss, loginTokenStr) =>
             {
                 if (succss)
                 {
                     Trace.WriteLine("Successfull login");
                     HideLogin();
+                    if (!String.IsNullOrEmpty(loginTokenStr))
+                    {
+                        Properties.Settings.Default.loginToken = loginTokenStr;
+                    }
                 }
                 else
                 {
@@ -129,9 +134,14 @@ namespace Excel_VSTO_AddIn
             });
         }
 
-        private void UploadResultHandler(string result)
+        private void UploadResultHandler(string result, bool loginRequired)
         {
             Trace.WriteLine($"Upload ended: {result}");
+
+            if (loginRequired)
+            {
+                ShowLogin("Upload Failed, login is required");
+            }
         }
 
         private void ShowLoginWrapper(string message)
