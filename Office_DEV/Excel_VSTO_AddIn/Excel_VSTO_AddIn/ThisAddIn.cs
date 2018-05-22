@@ -34,7 +34,7 @@ namespace Excel_VSTO_AddIn
         Microsoft.Office.Tools.CustomTaskPane _loginPane = null;
         UserControlLogin _loginCtrl = null;
         // NOTE: This regexp doesn't allow spaces in the filename. Fix needed if requirements allow space in filename.
-        private string _filenameRegexPattern = $"{DOKKA_PREFIX}_.*_{"[a-fA-F0-9]{10}"}_.*\\..*";
+        private string _filenameRegexPattern = $"^{DOKKA_PREFIX}_.*_{"[a-fA-F0-9]{10}"}_.*\\..*";
         
         Thread _mainThread = Thread.CurrentThread;
 
@@ -95,10 +95,11 @@ namespace Excel_VSTO_AddIn
                     Trace.WriteLine($"Failure attempting to upload file: {ex.Message}\n{ex.InnerException?.Message??""}");
                 }
                 
-
-                // Delete the file some day, should add callback to upload for that.
             });
             task.Start();
+
+            Trace.WriteLine("SAVING FILE TO DISK");
+            Wb.Save();
         }
 
         #region VSTO generated code
@@ -134,7 +135,7 @@ namespace Excel_VSTO_AddIn
             }
             else
             {
-                Trace.WriteLine("UPLOAD ALREADY IN PROGRESS: Abording requested upload");
+                Trace.WriteLine("UPLOAD ALREADY IN PROGRESS: Abording requested upload.");
                 result = new Task(() => { });
             }
 
