@@ -184,7 +184,22 @@ namespace Excel_VSTO_AddIn
             } else
             {
                 Trace.WriteLine("CLEARING CURRENT UPLOAD");
-                _currentUpload = null;
+                if (_currentUpload != null)
+                {
+                    var copyFilePath = _currentUpload.NewName;
+                    try
+                    {
+                        System.IO.File.Delete(copyFilePath);
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.WriteLine($"Failure deleting file {copyFilePath}.\n{e.Message}\n{e.InnerException?.Message ?? ""}");
+                    }
+                    _currentUpload = null;
+                } else
+                {
+                    Trace.WriteLine("WARNING: ** Current upload was NULL **");
+                }
             }
         }
 
