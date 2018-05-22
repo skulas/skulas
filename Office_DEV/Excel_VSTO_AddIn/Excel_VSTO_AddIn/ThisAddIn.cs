@@ -79,7 +79,16 @@ namespace Excel_VSTO_AddIn
 
                 filename = $"{namepart}_{DateTime.Now.ToString("yyyy_MMM_dd__HH_mm")}.{extension}";
                 tempPath = $"{tempPath}{filename}";
+            } else
+            {
+                // file is in HD, don't upload if it's a dokka doc
+                if (IsDokkaManagedFilename(Wb.Name))
+                {
+                    Trace.WriteLine($"The file {Wb.Name} is already managed by dokka, no need to upload it again");
+                    return;
+                }
             }
+
             var uploadTask = UploadFile(Wb, tempPath, (tempPath == null), filename);
             uploadTask.Start();
             await uploadTask;

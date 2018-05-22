@@ -43,6 +43,7 @@ FIXED 13.Save as opens the copy.
 
 13. ERROR Handling. Currently there's no information displayed to the user regarding problems detected by the system. **TBD
 14. INSTALL / Deployment method.
+15. Show user messages about result of actions? (Upload fail / finish, Save upload fail/finish, etc...) **TBD
 
 **** ASK FROM ARIK *** Upload Api and Login Api
 
