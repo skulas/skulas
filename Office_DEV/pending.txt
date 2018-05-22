@@ -26,20 +26,20 @@ Save To Dokka Button:
 
 
 Flow:
-1. User logs in and gets token.
-2. Upload is done with token.
-3. >>>> YES, upload after successful login: SHALL DO UPLOAD AFTER LOGIN?? CURRENTLY DOES LOGIN OR UPLOAD UPPON SAVE.
+FIXED 1. User logs in and gets token.
+FIXED 2. Upload is done with token.
+FIXED 3. >>>> YES, upload after successful login: SHALL DO UPLOAD AFTER LOGIN?? CURRENTLY DOES LOGIN OR UPLOAD UPPON SAVE.
 4. Need to persist username/password. No built in solution in windows such as keychain in mac.
 5. Need to define together with Arik / Emil a way to validate file-token vs file-name vs client. 
 	This way users cannot just edit the filename and upload another file just because it matches the regexp
 6. *** MUST ***: Remove extra row added uppon upload for debug
-7. Need to login again if Token expired.
-8. Perist Token between Excel executions??
+FIXED 7. Need to login again if Token expired.
+FIXED 8. Perist Token between Excel executions??
 9. Implement same for Word. MINIMAL boilerplate.
 10.Test alternatives to the saved copy path (currently doing in same folder as original document)
-11.Should delete the copy created for upload.
-12.Server is using stub with Dummy token for login. Need to define logic with Arik / Emil.
-13.Save as opens the copy.
+FIXED 11.Should delete the copy created for upload.
+IT'S OK :: 12.Server is using stub with Dummy token for login. Need to define logic with Arik / Emil.
+FIXED 13.Save as opens the copy.
 
 13. ERROR Handling. Currently there's no information displayed to the user regarding problems detected by the system. **TBD
 14. INSTALL / Deployment method.
