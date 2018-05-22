@@ -11,7 +11,7 @@ namespace office_uploads.Controllers
 {
     public class LoginController : ApiController
     {
-        public static string DummyTokenForTesting { get; set; } = "FFF000FFF9";
+        public static string DummyTokenForTesting { get; set; } = "FFF000FFFB";
 
         // GET: api/Login
         public IEnumerable<string> Get()
