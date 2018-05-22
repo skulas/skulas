@@ -58,7 +58,18 @@ namespace Excel_VSTO_AddIn
             MultipartFormDataContent form = new MultipartFormDataContent();
             var fileBytes = File.ReadAllBytes(filePath);
             form.Add(new ByteArrayContent(fileBytes, 0, fileBytes.Length), "office_file", fileName);
-            HttpResponseMessage response = await httpClient.PostAsync($"{_serverRoot}/values", form);
+            HttpResponseMessage response = null;
+            try
+            {
+                response = await httpClient.PostAsync($"{_serverRoot}/values", form);
+            } catch (Exception e)
+            {
+                Trace.WriteLine($"Failure when attempting to upload file: {e.Message}\n{e.InnerException?.Message ?? ""}");
+                uploadResultHandler("Upload crashed when calling the server", false);
+
+                return;
+            }
+
 
             if (response == null)
             {
@@ -75,6 +86,7 @@ namespace Excel_VSTO_AddIn
 
                 return;
             }
+
             var content = await response.Content.ReadAsStringAsync(); // check in the future if we want to implement a callback to the addin once upload is done / failed
             uploadResultHandler(content, false);
         }

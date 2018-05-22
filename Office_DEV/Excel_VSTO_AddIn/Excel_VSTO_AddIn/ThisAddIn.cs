@@ -18,6 +18,13 @@ namespace Excel_VSTO_AddIn
 {
     public partial class ThisAddIn
     {
+        public class UploadProgress
+        {
+            public string Name { get; set; }
+            public string NewName { get; set; }
+        }
+
+        private UploadProgress _currentUpload = null;
         private const string DOKKA_PREFIX = "Dokka#managed#file";
         //private const string FILENAME_FREE_PART = "FREE_STRING"; // Any string
         //private const string CUSTOMER_REF_PART = "0000000000"; // 10 hexadecimal digits
@@ -82,7 +89,7 @@ namespace Excel_VSTO_AddIn
 
                 try
                 {
-                    await ServerInterface.Instance.UploadFileAtPath(newName, name, ShowLoginWrapper, UploadResultHandler);
+                    await SendFileToServer(newName, name);
                 } catch (Exception ex)
                 {
                     Trace.WriteLine($"Failure attempting to upload file: {ex.Message}\n{ex.InnerException?.Message??""}");
@@ -112,6 +119,28 @@ namespace Excel_VSTO_AddIn
 
         #region Utils and Logic
 
+        private Task SendFileToServer(string newName, string name)
+        {
+            Task result;
+            if (_currentUpload == null)
+            {
+                _currentUpload = new UploadProgress()
+                {
+                    Name = name,
+                    NewName = newName
+                };
+
+                result = ServerInterface.Instance.UploadFileAtPath(newName, name, ShowLoginWrapper, UploadResultHandler);
+            }
+            else
+            {
+                Trace.WriteLine("UPLOAD ALREADY IN PROGRESS: Abording requested upload");
+                result = new Task(() => { });
+            }
+
+            return result;
+        }
+
         private async void LoginActionCallback(string username, string password)
         {
 
@@ -124,6 +153,16 @@ namespace Excel_VSTO_AddIn
                     if (!String.IsNullOrEmpty(loginTokenStr))
                     {
                         Properties.Settings.Default.loginToken = loginTokenStr;
+
+                        if (_currentUpload != null)
+                        {
+                            Trace.WriteLine("Upload detected, resuming upload after successful login");
+                            var name = _currentUpload.Name;
+                            var newName = _currentUpload.NewName;
+                            _currentUpload = null;
+                            var sendTask = SendFileToServer(newName, name);
+                            sendTask.Wait();
+                        }
                     }
                 }
                 else
@@ -141,6 +180,10 @@ namespace Excel_VSTO_AddIn
             if (loginRequired)
             {
                 ShowLogin("Upload Failed, login is required");
+            } else
+            {
+                Trace.WriteLine("CLEARING CURRENT UPLOAD");
+                _currentUpload = null;
             }
         }
 
