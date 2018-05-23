@@ -15,12 +15,12 @@ namespace Excel_VSTO_AddIn
 
         private void BtnSaveToDokka_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.SaveFileToDokka();
+            Globals.ThisAddIn.SendFileToDokka();
         }
 
         private void BtnSaveToDokkaFromFile_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.SaveFileToDokka();
+            Globals.ThisAddIn.SendFileToDokka();
         }
     }
 }

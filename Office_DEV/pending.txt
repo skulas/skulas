@@ -44,18 +44,7 @@ FIXED 13.Save as opens the copy.
 13. ERROR Handling. Currently there's no information displayed to the user regarding problems detected by the system. **TBD
 14. INSTALL / Deployment method.
 15. Show user messages about result of actions? (Upload fail / finish, Save upload fail/finish, etc...) **TBD
-
-**** ASK FROM ARIK *** Upload Api and Login Api
-Two login steps:
-1.
-email: account1@dokka.me
-pwd: qwerty1
-
-2.
-use token from first login
-t1Token: Token
-email: company.email9@foo.com
-
+16. Shall we auto re-login if token expires and we still have email/pwd/account in memory?
 
 
 File Format:
@@ -74,3 +63,15 @@ Tests:
 5. Unsaved changes. NEED TO DEFINE BEHAVIOR.
 6. Save uppon close app, check if upload succeeds
 7. Check files with different names and valid and not valid dokka format.
+
+================
+Two Steps LOGIN:
+1.
+email: account1@dokka.me
+pwd: qwerty1
+
+2.
+use token from first login
+t1Token: Token
+email: company.email9@foo.com
+

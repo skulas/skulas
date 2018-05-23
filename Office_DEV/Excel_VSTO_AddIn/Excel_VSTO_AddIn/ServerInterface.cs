@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -14,16 +16,15 @@ namespace Excel_VSTO_AddIn
     {
         private static ServerInterface _instance;
         //private const string _serverRoot = "https://localhost:44300/api";//http://api-dev.dokka.biz/api/v2/3/loginUser
-        private const string _serverRoot = "http://api-dev.dokka.biz/api/v2/3";
-
-        private string _dokkaServerToken = null;
-        public string DokkaServerToken { get { return _dokkaServerToken; } }
+        private const string CLIENT_PATH_PARAM = "3";
+        private string _serverRoot = $"http://api-dev.dokka.biz/api/v2/{CLIENT_PATH_PARAM}";
+        public string DokkaServerToken { get; private set; } = null;
 
         private ServerInterface()
         {
             if (!String.IsNullOrEmpty(Properties.Settings.Default.loginToken))
             {
-                _dokkaServerToken = Properties.Settings.Default.loginToken;
+                DokkaServerToken = Properties.Settings.Default.loginToken;
             }
         }
 
@@ -41,7 +42,7 @@ namespace Excel_VSTO_AddIn
 
         public async Task UploadFileAtPath(string filePath, string fileName, Action<string> showLoginFunc, Action<string, bool>uploadResultHandler)
         {
-            if (String.IsNullOrEmpty(_dokkaServerToken))
+            if (String.IsNullOrEmpty(DokkaServerToken))
             {
                 Trace.WriteLine("User must login first");
                 showLoginFunc("Login required to upload a file to Dokka");
@@ -50,16 +51,29 @@ namespace Excel_VSTO_AddIn
             }
 
             HttpClient httpClient = new HttpClient();
-            // Auth header with token sent by the server
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _dokkaServerToken);
+            //httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+            httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
+            httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en-US"));
+            httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
+            httpClient.DefaultRequestHeaders.ExpectContinue = false;
 
-            MultipartFormDataContent form = new MultipartFormDataContent();
+            MultipartFormDataContent form = new MultipartFormDataContent(/*"DOKKA_EXCEL_UPLOADER_BOUNDRY"*/);
             var fileBytes = File.ReadAllBytes(filePath);
-            form.Add(new ByteArrayContent(fileBytes, 0, fileBytes.Length), "office_file", fileName);
+            //var byteArrayContent = new ByteArrayContent(fileBytes, 0, fileBytes.Length);
+            var byteArrayContent = GCompress(fileBytes);
+            // var urlEncodedFilename = Uri.EscapeUriString(fileName);
+
+            byteArrayContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { FileName = $"\"{fileName}\"", Name = "\"file\"" };
+            byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            //form.Add(, "file", fileName);
+            // form.Add(new StringContent("3"), "client");
             HttpResponseMessage response = null;
+            form.Add(byteArrayContent, "file", fileName);
             try
             {
-                response = await httpClient.PostAsync($"{_serverRoot}/values", form);
+                response = await httpClient.PostAsync($"{_serverRoot}/uploadDocument?dokkaToken={DokkaServerToken}", form);
             } catch (Exception e)
             {
                 Trace.WriteLine($"Failure when attempting to upload file: {e.Message}\n{e.InnerException?.Message ?? ""}");
@@ -100,8 +114,8 @@ namespace Excel_VSTO_AddIn
             };
 
             var loginDataStr = JsonConvert.SerializeObject(loginDic);
-            // StringContent postContent = new StringContent(loginDataStr);
-            FormUrlEncodedContent postContent = new FormUrlEncodedContent(loginDic);
+            StringContent postContent = new StringContent(loginDataStr, Encoding.UTF8, "application/json");
+            //FormUrlEncodedContent postContent = new FormUrlEncodedContent(loginDic);
             HttpResponseMessage response = null;
 
             // First Login
@@ -128,8 +142,6 @@ namespace Excel_VSTO_AddIn
 
                 return;
             }
-
-
 
             var content = response.Content;
             var contentStr = await content.ReadAsStringAsync();
@@ -161,6 +173,8 @@ namespace Excel_VSTO_AddIn
                 { "t1Token", loginToken },
                 { "language", "en"}
             };
+            loginDataStr = JsonConvert.SerializeObject(loginDic);
+            postContent = new StringContent(loginDataStr, Encoding.UTF8, "application/json");
             try
             {
                 response = await httpClient.PostAsync($"{_serverRoot}/loginUser", postContent);
@@ -201,8 +215,8 @@ namespace Excel_VSTO_AddIn
             }
             else
             {
-                _dokkaServerToken = loginToken;
-                Properties.Settings.Default.loginToken = _dokkaServerToken;
+                DokkaServerToken = loginToken;
+                Properties.Settings.Default.loginToken = DokkaServerToken;
                 Properties.Settings.Default.Save();
             }
 
@@ -233,6 +247,19 @@ namespace Excel_VSTO_AddIn
 
             errorMessage = null;
             return true;
+        }
+
+        private static ByteArrayContent GCompress(byte[] Bytes)
+        {
+            // Compress given data using gzip 
+            using (var Stream = new MemoryStream())
+            {
+                using (var Zipper = new GZipStream(Stream, CompressionMode.Compress, true)) Zipper.Write(Bytes, 0, Bytes.Length);
+                var Content = new ByteArrayContent(Stream.ToArray());
+                Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                Content.Headers.ContentEncoding.Add("gzip");
+                return Content;
+            }
         }
     }
 }
