@@ -62,6 +62,9 @@ File Format:
 Dokka#managed#file_mashebali_0123456789_configString
 
 
+Dokka GIT repo token:
+c82b9267b4101dc0eafb3c2cfcd8f3b68b838179
+
 
 Tests:
 1. No file / blank file / new file

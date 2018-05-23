@@ -13,13 +13,11 @@ namespace Excel_VSTO_AddIn
     public class ServerInterface
     {
         private static ServerInterface _instance;
-        private const string _serverRoot = "https://localhost:44300/api";
+        //private const string _serverRoot = "https://localhost:44300/api";//http://api-dev.dokka.biz/api/v2/3/loginUser
+        private const string _serverRoot = "http://api-dev.dokka.biz/api/v2/3";
 
         private string _dokkaServerToken = null;
         public string DokkaServerToken { get { return _dokkaServerToken; } }
-
-        private string _fileIdentifier = null;
-        public string FileIdentifier { get { return _fileIdentifier; } }
 
         private ServerInterface()
         {
@@ -91,22 +89,25 @@ namespace Excel_VSTO_AddIn
             uploadResultHandler(content, false);
         }
 
-        public async Task LoginWithCredentials(string username, string password, Action<bool, string> loginCallback)
+        public async Task LoginWithCredentials(string userIdentifier, string password, string companyIdentifier, Action<bool, string> loginCallback)
         {
             HttpClient httpClient = new HttpClient();
             Dictionary<string, string> loginDic = new Dictionary<string, string>
             {
-                { "username", username },
-                { "password", password }
+                { "email", userIdentifier },
+                { "password", password },
+                { "language", "en"}
             };
+
             var loginDataStr = JsonConvert.SerializeObject(loginDic);
             // StringContent postContent = new StringContent(loginDataStr);
             FormUrlEncodedContent postContent = new FormUrlEncodedContent(loginDic);
             HttpResponseMessage response = null;
 
+            // First Login
             try
             {
-                response = await httpClient.PostAsync($"{_serverRoot}/Login", postContent);
+                response = await httpClient.PostAsync($"{_serverRoot}/loginUser", postContent);
             } catch (Exception ex)
             {
                 Trace.WriteLine($"Error when doing login: {ex.Message}\n{ex.InnerException?.Message ?? ""}");
@@ -115,56 +116,123 @@ namespace Excel_VSTO_AddIn
                 return;
             }
 
-            if (response == null)
+            if (!ValidateResponse(response, out string responseProblem))
             {
-                Trace.WriteLine("Login failure. Response is null. Super weird");
-                loginCallback(false, null);
-
-                return;
-            } else if (response.StatusCode != System.Net.HttpStatusCode.OK)
-            {
-                Trace.WriteLine($"Login Failure. Got Error {response.StatusCode} from server");
-                loginCallback(false, null);
+                Trace.WriteLine($"Failure at login step 1: {responseProblem}");
+                string loginErrorMessage = null;
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    loginErrorMessage = "Invalid Username or Password";
+                }
+                loginCallback(false, loginErrorMessage);
 
                 return;
             }
+
+
 
             var content = response.Content;
             var contentStr = await content.ReadAsStringAsync();
 
-            var result = (Dictionary<string, string>)JsonConvert.DeserializeObject(contentStr, typeof(Dictionary<string, string>));
-            bool loginSuccess = false;
-            string loginSuccessStr = $"Parsing Failure. Respose from server: {contentStr}";
-            string filenameToken = null;
             string loginToken = null;
 
             try
             {
-                loginSuccessStr = result["success"];
-                loginToken = result["login-token"];
-                filenameToken = result["file-token"];
-                if (bool.TryParse(loginSuccessStr, out loginSuccess))
-                {
-                    Trace.WriteLine(result["details"]);
-                }
-                else
-                {
-                    Trace.WriteLine($"Failure parsing server respose, success str: {loginSuccessStr}");
-                }
-            } catch { }
+                var result = (Dictionary<string, string>)JsonConvert.DeserializeObject(contentStr, typeof(Dictionary<string, string>));
+                loginToken = result["dokkaToken"];
+            } catch(Exception ex)
+            {
+                Trace.WriteLine($"Failure extating token from response {contentStr}. Error: {ex.Message}\n{ex.InnerException?.Message ?? ""}");
+            }
+            
+            if (String.IsNullOrEmpty(loginToken))
+            {
+                Trace.WriteLine($"Login failed: The login token wasn't supplied by the server.");
 
-            if (loginSuccess && (filenameToken != null))
-            {
-                _dokkaServerToken = loginToken;
-                _fileIdentifier = filenameToken;
-                Properties.Settings.Default.loginToken = _dokkaServerToken;
-                Properties.Settings.Default.Save();
-            } else
-            {
-                Trace.WriteLine($"Login failed: {result["details"]}");
+                loginCallback(false, null);
+                return;
             }
 
-            loginCallback(loginSuccess, loginToken);
+
+            // Login Step Two
+            loginDic = new Dictionary<string, string>
+            {
+                { "email", companyIdentifier },
+                { "t1Token", loginToken },
+                { "language", "en"}
+            };
+            try
+            {
+                response = await httpClient.PostAsync($"{_serverRoot}/loginUser", postContent);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Error when doing login: {ex.Message}\n{ex.InnerException?.Message ?? ""}");
+                loginCallback(false, null);
+
+                return;
+            }
+            if (!ValidateResponse(response, out string problemsStr))
+            {
+                Trace.WriteLine($"Failure at login step 2: {problemsStr}");
+                loginCallback(false, null);
+
+                return;
+            }
+            content = response.Content;
+            contentStr = await content.ReadAsStringAsync();
+            try
+            {
+                var result = (Dictionary<string, string>)JsonConvert.DeserializeObject(contentStr, typeof(Dictionary<string, string>));
+                loginToken = result["dokkaToken"];
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Login Step2 failure extating token from response {contentStr}. Error: {ex.Message}\n{ex.InnerException?.Message ?? ""}");
+                loginToken = null;
+            }
+            
+            if (String.IsNullOrEmpty(loginToken))
+            {
+                Trace.WriteLine($"Login Step 2 failed: The login token wasn't supplied by the server.");
+                
+                loginCallback(false, null);
+                return;
+            }
+            else
+            {
+                _dokkaServerToken = loginToken;
+                Properties.Settings.Default.loginToken = _dokkaServerToken;
+                Properties.Settings.Default.Save();
+            }
+
+            loginCallback(true, loginToken);
+        }
+
+        private bool ValidateResponse(HttpResponseMessage response, out string errorMessage)
+        {
+            if (response == null)
+            {
+                errorMessage = "Login failure. Response is null. Super weird";
+
+                return false;
+            }
+            else if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    errorMessage = $"Login Failure. Got Error {response.StatusCode} from server. User is not valid";
+                } else
+                {
+                    errorMessage = $"Login Failure. Got Error {response.StatusCode} from server";
+                }
+                
+
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
         }
     }
 }

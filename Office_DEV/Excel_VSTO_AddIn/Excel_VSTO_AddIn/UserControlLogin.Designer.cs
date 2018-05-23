@@ -34,6 +34,8 @@
             this.fldPwd = new System.Windows.Forms.TextBox();
             this.btnLogin = new System.Windows.Forms.Button();
             this.lblLoginStatus = new System.Windows.Forms.Label();
+            this.listAccounts = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label2
@@ -87,10 +89,32 @@
             this.lblLoginStatus.Size = new System.Drawing.Size(0, 13);
             this.lblLoginStatus.TabIndex = 6;
             // 
+            // listAccounts
+            // 
+            this.listAccounts.FormattingEnabled = true;
+            this.listAccounts.Items.AddRange(new object[] {
+            "acc1",
+            "acc2"});
+            this.listAccounts.Location = new System.Drawing.Point(8, 149);
+            this.listAccounts.Name = "listAccounts";
+            this.listAccounts.Size = new System.Drawing.Size(155, 21);
+            this.listAccounts.TabIndex = 7;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(59, 131);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(46, 13);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "account";
+            // 
             // UserControlLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.listAccounts);
             this.Controls.Add(this.lblLoginStatus);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.fldPwd);
@@ -111,5 +135,7 @@
         private System.Windows.Forms.TextBox fldPwd;
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label lblLoginStatus;
+        private System.Windows.Forms.ComboBox listAccounts;
+        private System.Windows.Forms.Label label1;
     }
 }

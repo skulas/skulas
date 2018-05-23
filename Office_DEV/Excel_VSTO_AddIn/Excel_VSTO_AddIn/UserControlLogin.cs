@@ -14,7 +14,7 @@ namespace Excel_VSTO_AddIn
     public partial class UserControlLogin : UserControl
     {
         //private Action<string, string> _loginAction;
-        public Action<string, string> LoginAction { get; set; } = null;
+        public Action<string, string, int> LoginAction { get; set; } = null;
 
         public string LoginStatusMessage { get {
                 return lblLoginStatus.Text;
@@ -24,11 +24,23 @@ namespace Excel_VSTO_AddIn
             }
         }
 
+        public string[] AccountsList {
+            get {
+                return null;
+            }
+            set
+            {
+                if (value != null)
+                    listAccounts.Items.Clear();
+                    listAccounts.Items.AddRange(value);
+            }
+        }
+
         public UserControlLogin() {
             InitializeComponent();
         }
 
-        public UserControlLogin(Action<string, string> loginAction)
+        public UserControlLogin(Action<string, string, int> loginAction)
         {
             LoginAction = loginAction;
             InitializeComponent();
@@ -36,7 +48,7 @@ namespace Excel_VSTO_AddIn
 
         private void BtnLogin_Click(object sender, EventArgs e)
         {
-            LoginAction?.Invoke(fldUsername.Text, fldPwd.Text);
+            LoginAction?.Invoke(fldUsername.Text, fldPwd.Text, listAccounts.SelectedIndex);
         }
     }
 }

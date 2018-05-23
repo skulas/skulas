@@ -30,15 +30,18 @@ namespace Excel_VSTO_AddIn
 
         private UploadProgress _currentUpload = null;
         private const string DOKKA_PREFIX = "Dokka#managed#file";
-        //private const string FILENAME_FREE_PART = "FREE_STRING"; // Any string
-        //private const string CUSTOMER_REF_PART = "0000000000"; // 10 hexadecimal digits
-        //private const string FILE_EXTNESION_PART = "FILE_EXTENSION";
-        //private const string FILE_CONFIG_PART = "FILE_CONFIG_PARRT"; // Any string
-        //private string FILENAME_PROTO = $"{DOKKA_PREFIX}_{FILENAME_FREE_PART}_{CUSTOMER_REF_PART}_{FILE_CONFIG_PART}.{FILE_EXTNESION_PART}";
+
         Microsoft.Office.Tools.CustomTaskPane _loginPane = null;
         UserControlLogin _loginCtrl = null;
+
         // NOTE: This regexp doesn't allow spaces in the filename. Fix needed if requirements allow space in filename.
         private string _filenameRegexPattern = $"^{DOKKA_PREFIX}_.*_{"[a-fA-F0-9]{10}"}_.*\\..*";
+
+        private Dictionary<string, string> _accountsStub = new Dictionary<string, string>()
+        {
+            { "account 1", "company.email9@foo.com" },
+            { "account 2", "company.email9@foo.com" }
+        };
         
         Thread _mainThread = Thread.CurrentThread;
 
@@ -194,18 +197,19 @@ namespace Excel_VSTO_AddIn
             return result;
         }
 
-        private async void LoginActionCallback(string username, string password)
+        private async void LoginActionCallback(string username, string password, int companyIx)
         {
-
-            await ServerInterface.Instance.LoginWithCredentials(username, password, (succss, loginTokenStr) =>
+            var selectedKey = _accountsStub.Keys.ElementAt(companyIx);
+            var companyEmail = _accountsStub[selectedKey];
+            await ServerInterface.Instance.LoginWithCredentials(username, password, companyEmail, (succss, responseStr) =>
             {
                 if (succss)
                 {
                     Trace.WriteLine("Successfull login");
                     HideLogin();
-                    if (!String.IsNullOrEmpty(loginTokenStr))
+                    if (!String.IsNullOrEmpty(responseStr))
                     {
-                        Properties.Settings.Default.loginToken = loginTokenStr;
+                        Properties.Settings.Default.loginToken = responseStr;
 
                         if (_currentUpload != null)
                         {
@@ -221,7 +225,7 @@ namespace Excel_VSTO_AddIn
                 else
                 {
                     Trace.WriteLine("Login failed");
-                    ShowLogin("Login Failure. Please try again");
+                    ShowLogin(responseStr??"Login Failure. Please try again");
                 }
             });
         }
@@ -292,6 +296,7 @@ namespace Excel_VSTO_AddIn
         private void CreateLogin()
         {
             _loginCtrl = new UserControlLogin(LoginActionCallback);
+            _loginCtrl.AccountsList = _accountsStub.Keys.ToArray();
             _loginPane = this.CustomTaskPanes.Add(_loginCtrl, "Login To Dokka");
             _loginPane.Visible = true;
         }
