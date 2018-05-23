@@ -61,7 +61,7 @@ namespace Excel_VSTO_AddIn
 
         #endregion INIT
 
-        public async void SaveFileToDokka()
+        public async void SendFileToDokka()
         {
             Microsoft.Office.Interop.Excel.Workbook Wb = Application.ActiveWorkbook;
             string tempPath = null;
@@ -92,9 +92,15 @@ namespace Excel_VSTO_AddIn
                 }
             }
 
-            var uploadTask = UploadFile(Wb, tempPath, (tempPath == null), filename);
-            uploadTask.Start();
-            await uploadTask;
+            var uploadTask = UploadFile(Wb, tempPath, false, filename);
+            if (uploadTask != null)
+            {
+                uploadTask.Start();
+                await uploadTask;
+            } else
+            {
+                Trace.WriteLine("Upload Aborted ....");
+            }
         }
 
         private void Application_WorkbookBeforeSave(Microsoft.Office.Interop.Excel.Workbook Wb, bool SaveAsUI, ref bool Cancel)
@@ -106,7 +112,13 @@ namespace Excel_VSTO_AddIn
             newFirstRow.Value2 = "Uploading the file";
 
             var uploadTask = UploadFile(Wb, null, true);
-            uploadTask.Start();
+            if (uploadTask != null)
+            {
+                uploadTask.Start();
+            } else
+            {
+                Trace.WriteLine("NOT UPLOADING THE FILE ..");
+            }
 
             Trace.WriteLine("SAVING FILE TO DISK");
             Wb.Save();
