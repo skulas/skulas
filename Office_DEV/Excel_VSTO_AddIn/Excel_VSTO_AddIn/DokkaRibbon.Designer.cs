@@ -35,35 +35,28 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DokkaRibbon));
-            this.tab1 = this.Factory.CreateRibbonTab();
-            this.group1 = this.Factory.CreateRibbonGroup();
-            this.btnSaveToDokka = this.Factory.CreateRibbonButton();
+            this.Dokka = this.Factory.CreateRibbonTab();
+            this.GroupDokka = this.Factory.CreateRibbonGroup();
             this.btnSaveToDokkaFromFile = this.Factory.CreateRibbonButton();
-            this.tab1.SuspendLayout();
-            this.group1.SuspendLayout();
+            this.btnSaveToDokka = this.Factory.CreateRibbonButton();
+            this.Dokka.SuspendLayout();
+            this.GroupDokka.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tab1
+            // Dokka
             // 
-            this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
-            this.tab1.Groups.Add(this.group1);
-            this.tab1.Label = "TabAddIns";
-            this.tab1.Name = "tab1";
+            this.Dokka.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
+            this.Dokka.ControlId.OfficeId = "TabHome";
+            this.Dokka.Groups.Add(this.GroupDokka);
+            this.Dokka.Label = "TabHome";
+            this.Dokka.Name = "Dokka";
             // 
-            // group1
+            // GroupDokka
             // 
-            this.group1.Items.Add(this.btnSaveToDokka);
-            this.group1.Label = "Upploads";
-            this.group1.Name = "group1";
-            // 
-            // btnSaveToDokka
-            // 
-            this.btnSaveToDokka.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.btnSaveToDokka.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveToDokka.Image")));
-            this.btnSaveToDokka.Label = "Save to Dokka";
-            this.btnSaveToDokka.Name = "btnSaveToDokka";
-            this.btnSaveToDokka.ShowImage = true;
-            this.btnSaveToDokka.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.BtnSaveToDokka_Click);
+            this.GroupDokka.Items.Add(this.btnSaveToDokka);
+            this.GroupDokka.Label = "Dokka";
+            this.GroupDokka.Name = "GroupDokka";
+            this.GroupDokka.Position = this.Factory.RibbonPosition.AfterOfficeId("GroupFont");
             // 
             // btnSaveToDokkaFromFile
             // 
@@ -71,8 +64,22 @@
             this.btnSaveToDokkaFromFile.ImageName = "Save to Dokka";
             this.btnSaveToDokkaFromFile.Label = "Save to Dokka";
             this.btnSaveToDokkaFromFile.Name = "btnSaveToDokkaFromFile";
+            this.btnSaveToDokkaFromFile.Position = this.Factory.RibbonPosition.AfterOfficeId("FileSaveToDocumentManagementServer");
+            this.btnSaveToDokkaFromFile.ScreenTip = "Upload File to Dokka";
             this.btnSaveToDokkaFromFile.ShowImage = true;
+            this.btnSaveToDokkaFromFile.SuperTip = "Sends the file to Dokka, even if it wasn\'t saved locally.";
             this.btnSaveToDokkaFromFile.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.BtnSaveToDokkaFromFile_Click);
+            // 
+            // btnSaveToDokka
+            // 
+            this.btnSaveToDokka.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.btnSaveToDokka.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveToDokka.Image")));
+            this.btnSaveToDokka.Label = "Upload";
+            this.btnSaveToDokka.Name = "btnSaveToDokka";
+            this.btnSaveToDokka.ScreenTip = "Send File to Dokka";
+            this.btnSaveToDokka.ShowImage = true;
+            this.btnSaveToDokka.SuperTip = "Sends the current file to dokka, event if wasn\'t saved locally.";
+            this.btnSaveToDokka.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.BtnSaveToDokka_Click);
             // 
             // DokkaRibbon
             // 
@@ -82,20 +89,20 @@
             // 
             this.OfficeMenu.Items.Add(this.btnSaveToDokkaFromFile);
             this.RibbonType = "Microsoft.Excel.Workbook";
-            this.Tabs.Add(this.tab1);
+            this.Tabs.Add(this.Dokka);
             this.Load += new Microsoft.Office.Tools.Ribbon.RibbonUIEventHandler(this.DokkaRibbon_Load);
-            this.tab1.ResumeLayout(false);
-            this.tab1.PerformLayout();
-            this.group1.ResumeLayout(false);
-            this.group1.PerformLayout();
+            this.Dokka.ResumeLayout(false);
+            this.Dokka.PerformLayout();
+            this.GroupDokka.ResumeLayout(false);
+            this.GroupDokka.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonTab Dokka;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup GroupDokka;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSaveToDokka;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSaveToDokkaFromFile;
     }
