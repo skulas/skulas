@@ -46,6 +46,16 @@ FIXED 13.Save as opens the copy.
 15. Show user messages about result of actions? (Upload fail / finish, Save upload fail/finish, etc...) **TBD
 
 **** ASK FROM ARIK *** Upload Api and Login Api
+Two login steps:
+1.
+email: account1@dokka.me
+pwd: qwerty1
+
+2.
+use token from first login
+t1Token: Token
+email: company.email9@foo.com
+
 
 
 File Format:
