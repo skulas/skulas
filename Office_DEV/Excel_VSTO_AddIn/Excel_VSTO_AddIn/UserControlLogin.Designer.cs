@@ -41,7 +41,7 @@
             // lblUsername
             // 
             this.lblUsername.AutoSize = true;
-            this.lblUsername.Location = new System.Drawing.Point(89, 34);
+            this.lblUsername.Location = new System.Drawing.Point(94, 34);
             this.lblUsername.Name = "lblUsername";
             this.lblUsername.Size = new System.Drawing.Size(31, 13);
             this.lblUsername.TabIndex = 1;
@@ -51,7 +51,7 @@
             // lblPwd
             // 
             this.lblPwd.AutoSize = true;
-            this.lblPwd.Location = new System.Drawing.Point(82, 75);
+            this.lblPwd.Location = new System.Drawing.Point(83, 75);
             this.lblPwd.Name = "lblPwd";
             this.lblPwd.Size = new System.Drawing.Size(52, 13);
             this.lblPwd.TabIndex = 2;
@@ -75,7 +75,7 @@
             // btnLogin
             // 
             this.btnLogin.Font = new System.Drawing.Font("Monotype Corsiva", 18F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLogin.Location = new System.Drawing.Point(71, 212);
+            this.btnLogin.Location = new System.Drawing.Point(71, 175);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(76, 48);
             this.btnLogin.TabIndex = 5;
@@ -86,9 +86,11 @@
             // lblLoginStatus
             // 
             this.lblLoginStatus.AutoSize = true;
-            this.lblLoginStatus.Location = new System.Drawing.Point(15, 184);
+            this.lblLoginStatus.Location = new System.Drawing.Point(26, 229);
+            this.lblLoginStatus.MaximumSize = new System.Drawing.Size(170, 0);
+            this.lblLoginStatus.MinimumSize = new System.Drawing.Size(170, 0);
             this.lblLoginStatus.Name = "lblLoginStatus";
-            this.lblLoginStatus.Size = new System.Drawing.Size(0, 13);
+            this.lblLoginStatus.Size = new System.Drawing.Size(170, 13);
             this.lblLoginStatus.TabIndex = 6;
             this.lblLoginStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -98,7 +100,7 @@
             this.listAccounts.Items.AddRange(new object[] {
             "acc1",
             "acc2"});
-            this.listAccounts.Location = new System.Drawing.Point(31, 149);
+            this.listAccounts.Location = new System.Drawing.Point(31, 141);
             this.listAccounts.Name = "listAccounts";
             this.listAccounts.Size = new System.Drawing.Size(156, 21);
             this.listAccounts.TabIndex = 7;
@@ -106,7 +108,7 @@
             // lblAccount
             // 
             this.lblAccount.AutoSize = true;
-            this.lblAccount.Location = new System.Drawing.Point(82, 131);
+            this.lblAccount.Location = new System.Drawing.Point(86, 123);
             this.lblAccount.Name = "lblAccount";
             this.lblAccount.Size = new System.Drawing.Size(46, 13);
             this.lblAccount.TabIndex = 8;

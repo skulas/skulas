@@ -90,6 +90,7 @@ namespace Excel_VSTO_AddIn
                 if (IsDokkaManagedFilename(Wb.Name))
                 {
                     Trace.WriteLine($"The file {Wb.Name} is already managed by dokka, no need to upload it again");
+                    Application.StatusBar = "This file is managed by Dokka. No need to upload it.";
                     return;
                 }
             }
@@ -102,16 +103,18 @@ namespace Excel_VSTO_AddIn
             } else
             {
                 Trace.WriteLine("Upload Aborted ....");
+                Application.StatusBar = "Cannot upload file to Dokka";
             }
         }
 
         private void Application_WorkbookBeforeSave(Microsoft.Office.Interop.Excel.Workbook Wb, bool SaveAsUI, ref bool Cancel)
         {
-            Excel.Worksheet activeWorksheet = ((Excel.Worksheet)Application.ActiveSheet);
-            Excel.Range firstRow = activeWorksheet.get_Range("A1");
-            firstRow.EntireRow.Insert(Excel.XlInsertShiftDirection.xlShiftDown);
-            Excel.Range newFirstRow = activeWorksheet.get_Range("A1");
-            newFirstRow.Value2 = "Uploading the file";
+            // NOTE: Uncomment these lines to debug on the body of the excel file.
+            //Excel.Worksheet activeWorksheet = ((Excel.Worksheet)Application.ActiveSheet);
+            //Excel.Range firstRow = activeWorksheet.get_Range("A1");
+            //firstRow.EntireRow.Insert(Excel.XlInsertShiftDirection.xlShiftDown);
+            //Excel.Range newFirstRow = activeWorksheet.get_Range("A1");
+            //newFirstRow.Value2 = "Uploading the file";
 
             var uploadTask = UploadFile(Wb, null, true);
             if (uploadTask != null)
@@ -122,7 +125,7 @@ namespace Excel_VSTO_AddIn
                 Trace.WriteLine("NOT UPLOADING THE FILE ..");
             }
 
-            Trace.WriteLine("SAVING FILE TO DISK");
+            Trace.WriteLine("SAVING FILE TO DISK by user save command.");
             Wb.Save();
         }
 
@@ -182,6 +185,7 @@ namespace Excel_VSTO_AddIn
                 catch (Exception ex)
                 {
                     Trace.WriteLine($"Failure attempting to upload file: {ex.Message}\n{ex.InnerException?.Message ?? ""}");
+                    Application.StatusBar = "The file couldn't be uploaded to Dokka";
                 }
 
             });
@@ -220,6 +224,8 @@ namespace Excel_VSTO_AddIn
                 if (succss)
                 {
                     Trace.WriteLine("Successfull login");
+                    this.Application.StatusBar = "You are now logged in to Dokka";
+
                     HideLogin();
                     if (!String.IsNullOrEmpty(responseStr))
                     {
@@ -239,6 +245,7 @@ namespace Excel_VSTO_AddIn
                 else
                 {
                     Trace.WriteLine("Login failed");
+                    Application.StatusBar = "Login to Dokka failed.";
                     ShowLogin(responseStr??"Login Failure. Please try again");
                 }
             });
@@ -250,10 +257,15 @@ namespace Excel_VSTO_AddIn
 
             if (loginRequired)
             {
-                ShowLogin("Upload Failed, login is required");
+                ShowLogin("Upload Failed, login is required before you can upload a file.");
             } else
             {
                 Trace.WriteLine("CLEARING CURRENT UPLOAD");
+                if (result != null)
+                {
+                    Application.StatusBar = result;
+                }
+
                 if (_currentUpload != null)
                 {
                     var copyFilePath = _currentUpload.NewName;
@@ -297,6 +309,8 @@ namespace Excel_VSTO_AddIn
                     _loginPane.Visible = true;
                 }, null);
             }
+
+            Trace.WriteLine("Showing Login UI");
         }
 
         private void HideLogin()
@@ -310,10 +324,13 @@ namespace Excel_VSTO_AddIn
 
         private void CreateLogin()
         {
-            _loginCtrl = new UserControlLogin(LoginActionCallback);
-            _loginCtrl.AccountsList = _accountsStub.Keys.ToArray();
+            _loginCtrl = new UserControlLogin(LoginActionCallback)
+            {
+                AccountsList = _accountsStub.Keys.ToArray()
+            };
             _loginPane = this.CustomTaskPanes.Add(_loginCtrl, "Login To Dokka");
             _loginPane.Visible = true;
+            Trace.WriteLine("Creating Login UI");
         }
 
         private bool IsDokkaManagedFilename(string filename)

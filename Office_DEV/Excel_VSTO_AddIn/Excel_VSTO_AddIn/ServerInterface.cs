@@ -74,7 +74,7 @@ namespace Excel_VSTO_AddIn
             } catch (Exception e)
             {
                 Trace.WriteLine($"Failure when attempting to upload file: {e.Message}\n{e.InnerException?.Message ?? ""}");
-                uploadResultHandler("Upload crashed when calling the server", false);
+                uploadResultHandler("Upload failure. Cannot reach Dokka cloud.", false);
 
                 return;
             }
@@ -83,7 +83,7 @@ namespace Excel_VSTO_AddIn
             if (response == null)
             {
                 Trace.WriteLine("Response is null. CHECK, this should not happen");
-                uploadResultHandler(null, false);
+                uploadResultHandler("Upload failure. Internal Dokka problem", false);
 
                 return;
             }
@@ -104,13 +104,13 @@ namespace Excel_VSTO_AddIn
                 Trace.WriteLine($"There was an error when uploading file. CODE: {response.StatusCode}");
                 bool showLogin = (response.StatusCode == System.Net.HttpStatusCode.Unauthorized);
 
-                uploadResultHandler(null, showLogin);
+                uploadResultHandler($"Upload to Dokka error. Error:{response.StatusCode}", showLogin);
 
                 return;
             }
 
             var content = await response.Content.ReadAsStringAsync(); // check in the future if we want to implement a callback to the addin once upload is done / failed
-            uploadResultHandler(content, false);
+            uploadResultHandler(String.IsNullOrEmpty(content) ? "Upload to Dokka Done" : content, false);
         }
 
         public async Task LoginWithCredentials(string userIdentifier, string password, string companyIdentifier, Action<bool, string> loginCallback)

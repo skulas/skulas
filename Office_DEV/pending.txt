@@ -45,6 +45,8 @@ FIXED 13.Save as opens the copy.
 14. INSTALL / Deployment method.
 15. Show user messages about result of actions? (Upload fail / finish, Save upload fail/finish, etc...) **TBD
 16. Shall we auto re-login if token expires and we still have email/pwd/account in memory?
+17. Tell Emil and Arik about the option to do ClickOnce install. (https://msdn.microsoft.com/en-us/library/bb772100.aspx)
+18. Add Logging.
 
 
 File Format:
@@ -63,6 +65,14 @@ Tests:
 5. Unsaved changes. NEED TO DEFINE BEHAVIOR.
 6. Save uppon close app, check if upload succeeds
 7. Check files with different names and valid and not valid dokka format.
+8. Test file with more than one tab.
+
+Fixes:
+1. Login UI status label messages cut. (Login required to upload a file to Dokka)
+2. First time I click the Upload it seems to do nothing.
+3. Update status when upload begins and when it ends / fails.
+3. Update status when login successful
+4. Change product name to something better than Excel_addin ...
 
 ================
 Two Steps LOGIN:
