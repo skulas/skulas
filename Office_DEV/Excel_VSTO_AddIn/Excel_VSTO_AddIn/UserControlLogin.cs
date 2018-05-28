@@ -30,9 +30,13 @@ namespace Excel_VSTO_AddIn
             }
             set
             {
-                if (value != null)
+                if ((value != null) && (value.Length > 0))
+                {
                     listAccounts.Items.Clear();
                     listAccounts.Items.AddRange(value);
+                    listAccounts.Text = value[0];
+                    listAccounts.SelectedIndex = 0;
+                }
             }
         }
 

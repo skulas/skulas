@@ -22,13 +22,13 @@ namespace Excel_VSTO_AddIn
         
         #region INIT
 
-        public class UploadProgress
+        public class Upload
         {
             public string Name { get; set; }
             public string NewName { get; set; }
         }
 
-        private UploadProgress _currentUpload = null;
+        private Upload _currentUpload = null;
         private const string DOKKA_PREFIX = "Dokka#managed#file";
 
         Microsoft.Office.Tools.CustomTaskPane _loginPane = null;
@@ -39,7 +39,7 @@ namespace Excel_VSTO_AddIn
 
         private Dictionary<string, string> _accountsStub = new Dictionary<string, string>()
         {
-            { "account 1", "company.email9@foo.com" },
+            { "account 9", "company.email9@foo.com" },
             { "account 2", "company.email9@foo.com" }
         };
         
@@ -60,6 +60,8 @@ namespace Excel_VSTO_AddIn
         }
 
         #endregion INIT
+
+
 
         public async void SendFileToDokka()
         {
@@ -192,7 +194,7 @@ namespace Excel_VSTO_AddIn
             Task result;
             if (_currentUpload == null)
             {
-                _currentUpload = new UploadProgress()
+                _currentUpload = new Upload()
                 {
                     Name = name,
                     NewName = newName
@@ -284,6 +286,7 @@ namespace Excel_VSTO_AddIn
                 TheWindowsFormsSynchronizationContext.Send(d =>
                 {
                     CreateLogin();
+                    _loginCtrl.LoginStatusMessage = message;
                 }, null);
             }
             else

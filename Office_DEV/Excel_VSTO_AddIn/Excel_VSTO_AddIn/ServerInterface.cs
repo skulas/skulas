@@ -16,7 +16,7 @@ namespace Excel_VSTO_AddIn
     {
         private static ServerInterface _instance;
         //private const string _serverRoot = "https://localhost:44300/api";//http://api-dev.dokka.biz/api/v2/3/loginUser
-        private const string CLIENT_PATH_PARAM = "3";
+        private const string CLIENT_PATH_PARAM = "3"; // 1 - iOS, 2 - Android, 3 - Web
         private string _serverRoot = $"http://api-dev.dokka.biz/api/v2/{CLIENT_PATH_PARAM}";
         public string DokkaServerToken { get; private set; } = null;
 
@@ -51,7 +51,7 @@ namespace Excel_VSTO_AddIn
             }
 
             HttpClient httpClient = new HttpClient();
-            //httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
             httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
@@ -61,14 +61,11 @@ namespace Excel_VSTO_AddIn
 
             MultipartFormDataContent form = new MultipartFormDataContent(/*"DOKKA_EXCEL_UPLOADER_BOUNDRY"*/);
             var fileBytes = File.ReadAllBytes(filePath);
-            //var byteArrayContent = new ByteArrayContent(fileBytes, 0, fileBytes.Length);
             var byteArrayContent = GCompress(fileBytes);
-            // var urlEncodedFilename = Uri.EscapeUriString(fileName);
 
             byteArrayContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { FileName = $"\"{fileName}\"", Name = "\"file\"" };
-            byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            //form.Add(, "file", fileName);
-            // form.Add(new StringContent("3"), "client");
+            // Uncomment if contentype is required (currently works without it and think about other formats such as CSV ...):
+            // byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             HttpResponseMessage response = null;
             form.Add(byteArrayContent, "file", fileName);
             try
@@ -89,7 +86,20 @@ namespace Excel_VSTO_AddIn
                 uploadResultHandler(null, false);
 
                 return;
-            } else if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            }
+            else if ((response.StatusCode == System.Net.HttpStatusCode.OK) ||
+              (response.StatusCode == System.Net.HttpStatusCode.NoContent))
+            {
+                /*
+                 * Arik on Slack - 27 May 2018
+                 * 204 - NoContent:
+                 * 
+                 * It’s a valid response
+                 * 204 means  no response content
+                 * 
+                 * */
+                Trace.WriteLine($"File {fileName} was successfully uloaded");
+            } else
             {
                 Trace.WriteLine($"There was an error when uploading file. CODE: {response.StatusCode}");
                 bool showLogin = (response.StatusCode == System.Net.HttpStatusCode.Unauthorized);
@@ -115,10 +125,9 @@ namespace Excel_VSTO_AddIn
 
             var loginDataStr = JsonConvert.SerializeObject(loginDic);
             StringContent postContent = new StringContent(loginDataStr, Encoding.UTF8, "application/json");
-            //FormUrlEncodedContent postContent = new FormUrlEncodedContent(loginDic);
             HttpResponseMessage response = null;
 
-            // First Login
+            // Login - Step 1
             try
             {
                 response = await httpClient.PostAsync($"{_serverRoot}/loginUser", postContent);
@@ -136,7 +145,7 @@ namespace Excel_VSTO_AddIn
                 string loginErrorMessage = null;
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    loginErrorMessage = "Invalid Username or Password";
+                    loginErrorMessage = "Invalid Email or Password";
                 }
                 loginCallback(false, loginErrorMessage);
 
@@ -166,7 +175,7 @@ namespace Excel_VSTO_AddIn
             }
 
 
-            // Login Step Two
+            // Login - Step Two
             loginDic = new Dictionary<string, string>
             {
                 { "email", companyIdentifier },
