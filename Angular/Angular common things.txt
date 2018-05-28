@@ -8,6 +8,9 @@ ng serve --open
 # Generate new component
 ng generate component heroes
 
+# Generate new service
+ng generate service hero
+ng generate service hero --module=app
 
 
 # Syntax Highlights
