@@ -61,7 +61,9 @@ namespace Excel_VSTO_AddIn
 
             MultipartFormDataContent form = new MultipartFormDataContent(/*"DOKKA_EXCEL_UPLOADER_BOUNDRY"*/);
             var fileBytes = File.ReadAllBytes(filePath);
-            var byteArrayContent = GCompress(fileBytes);
+            // GZip is not yet supported by the server: var byteArrayContent = GCompress(fileBytes);
+            var byteArrayContent = new ByteArrayContent(fileBytes);
+            byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             byteArrayContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") { FileName = $"\"{fileName}\"", Name = "\"file\"" };
             // Uncomment if contentype is required (currently works without it and think about other formats such as CSV ...):
