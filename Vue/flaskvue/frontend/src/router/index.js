@@ -6,6 +6,7 @@ const routerOptions = [
   {path: '/home', component: 'Home'},
   {path: '/about', component: 'About'},
   {path: '/hello', component: 'HelloWorld'},
+  {path: '/products', component: 'Products'},
   {path: '*', component: 'NotFound'}
 ]
 

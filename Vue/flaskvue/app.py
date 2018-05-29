@@ -9,9 +9,28 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route('/api/random')
 def random_number():
+    print("Random Numbers")
     response = {
-        'randomNumber' : randint(1,100)
+        'randomNumber' : randint(0,33)*3+1
     }
+    
+    return jsonify(response)
+
+@app.route('/api/getProducts')
+def get_products():
+    response = {
+        'products' : [
+            "La Re Puta", "Que Pario", "A esta" , "MIERDA"
+        ]
+    }
+        # {"Boots" : {"quantity" : 5 , "name": "Botas"}},
+        # {"Socks" : {"quantity" : 12 , "name": "Adidas"}},
+        # {"Snickers" : {"quantity" : 4 , "name": "Nike"}}
+        # ]
+    # }
+    # print("Response products:")
+    # print(response)
+    # print(jsonify(response))
     return jsonify(response)
 
 @app.route('/', defaults={'path': ''})

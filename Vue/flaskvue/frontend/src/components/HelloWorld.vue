@@ -5,6 +5,14 @@
     <ul>
       <li>
         <a
+          href="https://github.com/vuejs/awesome-vue"
+          target="_blank"
+        >
+          AMAZING curated list of Vue Links!
+        </a>
+      </li>
+      <li>
+        <a
           href="https://vuejs.org"
           target="_blank"
         >
