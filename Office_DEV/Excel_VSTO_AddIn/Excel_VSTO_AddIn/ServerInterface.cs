@@ -234,6 +234,11 @@ namespace Excel_VSTO_AddIn
             loginCallback(true, loginToken);
         }
 
+        public void ResetLoginToken()
+        {
+            DokkaServerToken = null;
+        }
+
         private bool ValidateResponse(HttpResponseMessage response, out string errorMessage)
         {
             if (response == null)

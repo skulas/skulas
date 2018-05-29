@@ -39,8 +39,8 @@ namespace Excel_VSTO_AddIn
 
         private Dictionary<string, string> _accountsStub = new Dictionary<string, string>()
         {
-            { "account 9", "company.email9@foo.com" },
-            { "account 2", "company.email9@foo.com" }
+            { "account 8", "company.email8@foo.com" },
+            { "account 9", "company.email9@foo.com" }
         };
         
         Thread _mainThread = Thread.CurrentThread;
@@ -63,14 +63,22 @@ namespace Excel_VSTO_AddIn
 
 
 
-        public async void SendFileToDokka()
+        public async void SendFileToDokka(bool resetToken = false)
         {
             Microsoft.Office.Interop.Excel.Workbook Wb = Application.ActiveWorkbook;
             string tempPath = null;
             string filename = null;
 
+            if (resetToken)
+            {
+                // Reset the login token.
+                Trace.WriteLine("Resetting Login Token");
+                ServerInterface.Instance.ResetLoginToken();
+            }
+
             if (String.IsNullOrEmpty(Wb.Path))
             {
+                // Sending a file that hasn't been saved yet to local storage.
                 tempPath = System.IO.Path.GetTempPath();
                 //string[] parts = Wb.FullName.Split(".".ToCharArray());
                 string namepart = "noname";

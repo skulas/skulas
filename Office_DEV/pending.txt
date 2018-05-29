@@ -41,13 +41,14 @@ FIXED 11.Should delete the copy created for upload.
 IT'S OK :: 12.Server is using stub with Dummy token for login. Need to define logic with Arik / Emil.
 FIXED 13.Save as opens the copy.
 
-13. ERROR Handling. Currently there's no information displayed to the user regarding problems detected by the system. **TBD
-14. INSTALL / Deployment method.
-15. Show user messages about result of actions? (Upload fail / finish, Save upload fail/finish, etc...) **TBD
+13. DONE: ERROR Handling. Currently there's no information displayed to the user regarding problems detected by the system. **TBD
+14. DONE: INSTALL / Deployment method.
+15. DONE: Show user messages about result of actions? (Upload fail / finish, Save upload fail/finish, etc...) **TBD
 16. Shall we auto re-login if token expires and we still have email/pwd/account in memory?
 17. Tell Emil and Arik about the option to do ClickOnce install. (https://msdn.microsoft.com/en-us/library/bb772100.aspx)
 18. Add Logging.
-
+19. Changing company once logged in is impossible.
+		FIXED: Ctrl + Click on Upload shows login again.
 
 File Format:
 Dokka#managed#file_mashebali_0123456789_configString
@@ -66,13 +67,15 @@ Tests:
 6. Save uppon close app, check if upload succeeds
 7. Check files with different names and valid and not valid dokka format.
 8. Test file with more than one tab.
+9. Uploaded a calendar with the first sheet empty. When looking at the web app, it shows a preview of the second seet, upside-down. Can be fixed using app-ui.
+	When I download the file using the web-app and try opening it in Excel, I get an error: "The file is corrupted"
 
 Fixes:
-1. Login UI status label messages cut. (Login required to upload a file to Dokka)
-2. First time I click the Upload it seems to do nothing.
-3. Update status when upload begins and when it ends / fails.
-3. Update status when login successful
-4. Change product name to something better than Excel_addin ...
+1. FIXED: Login UI status label messages cut. (Login required to upload a file to Dokka)
+2. First time I click the Upload it seems to do nothing. - ** VERY HARD TO REPRODUCE **
+3. FIXED: Update status when upload begins and when it ends / fails.
+3. FIXED: Update status when login successful
+4. FIXED: Change product name to something better than Excel_addin ...
 
 ================
 Two Steps LOGIN:
