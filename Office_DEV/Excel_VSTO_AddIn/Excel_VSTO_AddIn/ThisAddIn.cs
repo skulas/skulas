@@ -126,7 +126,14 @@ namespace Excel_VSTO_AddIn
             }
 
             Trace.WriteLine("SAVING FILE TO DISK by user save command.");
-            Wb.Save();
+            try
+            {
+                Wb.Save();
+            } catch (Exception e)
+            {
+                Trace.WriteLine($"Error while saving, probably the user clicked cancel when saing a new file. Error: {e.Message}\n{e.InnerException?.Message ?? ""}");
+            }
+            
         }
 
         #region VSTO generated code
