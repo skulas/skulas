@@ -1,0 +1,12 @@
+Office_DEV/Excel_AddIn/node_modules/
+Office_DEV/Excel_VSTO_AddIn/Excel_VSTO_AddIn/.vs/
+Office_DEV/Excel_VSTO_AddIn/Excel_VSTO_AddIn/obj/
+Office_DEV/Excel_VSTO_AddIn/Excel_VSTO_AddIn/packages/
+Office_DEV/office_uploads_server/.vs/
+Office_DEV/office_uploads_server/office_uploads/App_Data/uploads/
+Office_DEV/office_uploads_server/office_uploads/bin/
+Office_DEV/office_uploads_server/office_uploads/obj/
+Vue/flaskvue/backend/venv/
+Vue/flaskvue/dist/static/
+Vue/flaskvue/frontend/node_modules/
+Vue/flaskvue/dist/
