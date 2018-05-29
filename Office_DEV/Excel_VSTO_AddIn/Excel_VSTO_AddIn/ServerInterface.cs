@@ -24,7 +24,7 @@ namespace Excel_VSTO_AddIn
         {
             if (!String.IsNullOrEmpty(Properties.Settings.Default.loginToken))
             {
-                DokkaServerToken = Properties.Settings.Default.loginToken;
+                DokkaServerToken = DokkaOfficeAddinConfiguration.Instance.LoginToken;
             }
         }
 
@@ -227,8 +227,7 @@ namespace Excel_VSTO_AddIn
             else
             {
                 DokkaServerToken = loginToken;
-                Properties.Settings.Default.loginToken = DokkaServerToken;
-                Properties.Settings.Default.Save();
+                DokkaOfficeAddinConfiguration.Instance.LoginToken = DokkaServerToken;
             }
 
             loginCallback(true, loginToken);
