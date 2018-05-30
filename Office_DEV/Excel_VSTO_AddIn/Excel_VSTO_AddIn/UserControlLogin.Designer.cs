@@ -71,6 +71,7 @@
             this.fldPwd.Name = "fldPwd";
             this.fldPwd.Size = new System.Drawing.Size(156, 20);
             this.fldPwd.TabIndex = 4;
+            this.fldPwd.UseSystemPasswordChar = true;
             // 
             // btnLogin
             // 
