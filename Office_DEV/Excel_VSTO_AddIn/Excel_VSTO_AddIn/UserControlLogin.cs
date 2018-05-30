@@ -24,6 +24,26 @@ namespace Excel_VSTO_AddIn
             }
         }
 
+        public string Username { get
+            {
+                return fldUsername.Text;
+            }
+            set
+            {
+                fldUsername.Text = value;
+            }
+        }
+
+        public string Password { get
+            {
+                return fldPwd.Text;
+            }
+            set
+            {
+                fldPwd.Text = value;
+            }
+        }
+
         public string[] AccountsList {
             get {
                 return null;

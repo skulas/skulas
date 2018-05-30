@@ -5,10 +5,10 @@
     <Setting Name="loginToken" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="username" Type="System.String" Scope="User">
-      <Value Profile="(Default)">email</Value>
+    <Setting Name="username" Type="System.byte[]" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="password" Type="System.String" Scope="User">
+    <Setting Name="password" Type="System.byte[]" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

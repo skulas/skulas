@@ -241,6 +241,9 @@ namespace Excel_VSTO_AddIn
                     Trace.WriteLine("Successfull login");
                     this.Application.StatusBar = "You are now logged in to Dokka";
 
+                    // Keep persistent login details
+                    DokkaOfficeAddinConfiguration.Instance.SaveLoginDetails(username, password);
+
                     HideLogin();
                     if (!String.IsNullOrEmpty(responseStr))
                     {
@@ -343,6 +346,12 @@ namespace Excel_VSTO_AddIn
             {
                 AccountsList = _accountsStub.Keys.ToArray()
             };
+            string username, password;
+            if (DokkaOfficeAddinConfiguration.Instance.RestoreUsernameAndPassword(out username, out password))
+            {
+                _loginCtrl.Password = password;
+                _loginCtrl.Username = username;
+            }
             _loginPane = this.CustomTaskPanes.Add(_loginCtrl, "Login To Dokka");
             _loginPane.Visible = true;
             Trace.WriteLine("Creating Login UI");

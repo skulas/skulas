@@ -37,10 +37,9 @@ namespace Excel_VSTO_AddIn.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("email")]
-        public string username {
+        public byte[] username {
             get {
-                return ((string)(this["username"]));
+                return ((byte[])(this["username"]));
             }
             set {
                 this["username"] = value;
@@ -49,10 +48,9 @@ namespace Excel_VSTO_AddIn.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string password {
+        public byte[] password {
             get {
-                return ((string)(this["password"]));
+                return ((byte[])(this["password"]));
             }
             set {
                 this["password"] = value;

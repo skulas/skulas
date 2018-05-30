@@ -32,6 +32,10 @@ namespace Excel_VSTO_AddIn
         {
             // Don't allow new instances of this class.
             _entropia = StrToByteArr("Somewhere. OOver the r4inb0w. I lo0k man");
+
+            Process currProcess = Process.GetCurrentProcess();
+            currProcess.StartInfo.LoadUserProfile = true;
+            
         }
 
         
@@ -69,30 +73,36 @@ namespace Excel_VSTO_AddIn
                 return;
             }
 
-            var encrPwd = BytesToStr(encrPwdData);
-            var encrUsr = BytesToStr(encrUsrData);
+            Properties.Settings.Default.username = encrUsrData;
+            Properties.Settings.Default.password = encrPwdData;
 
-            if ( (encrPwd != null) && (encrUsr != null) )
-            {
-                Properties.Settings.Default.username = encrUsr;
-                Properties.Settings.Default.password = encrPwd;
-
-                Properties.Settings.Default.Save();
-            } else
-            {
-                Trace.WriteLine("Failure parsing encrypted data");
-            }
+            Properties.Settings.Default.Save();
         }
 
         public bool RestoreUsernameAndPassword(out string username, out string password)
         {
-            string internalUsername = null;
-            string internalPassword = null;
+            var usrEncrDat = Properties.Settings.Default.username;
+            var pwdEncrDat = Properties.Settings.Default.password;
 
+            if ((usrEncrDat == null) || (pwdEncrDat == null))
+            {
+                Trace.WriteLine("Username or password are not available for restore.");
+                username = password = null;
+                return false;
+            }
 
-            username = internalUsername;
-            password = internalPassword;
+            var usrDat = Unprotect(usrEncrDat);
+            var pwdDat = Unprotect(pwdEncrDat);
 
+            if ((usrDat == null) || (pwdDat == null))
+            {
+                Trace.WriteLine("ERROR: Cannot decrypt data");
+                username = password = null;
+                return false;
+            }
+
+            username = BytesToStr(usrDat);
+            password = BytesToStr(pwdDat);
 
             return true;
         }
@@ -106,7 +116,7 @@ namespace Excel_VSTO_AddIn
 
             try
             {
-                result = Encoding.UTF8.GetBytes("Somewhere. OOver the r4inb0w. I lo0k man");
+                result = Encoding.Unicode.GetBytes(str);
             } catch (Exception e)
             {
                 Trace.WriteLine($"Failure transforming string to byte[]. Error: {e.Message}\n{e.InnerException?.Message ?? ""}");
@@ -122,7 +132,7 @@ namespace Excel_VSTO_AddIn
 
             try
             {
-                result = Encoding.UTF8.GetString(data);
+                result = Encoding.Unicode.GetString(data);
             } catch (Exception e)
             {
                 Trace.WriteLine($"Failure decoding data to string. Error: {e.Message}\n{e.InnerException?.Message ?? ""}");
@@ -155,9 +165,18 @@ namespace Excel_VSTO_AddIn
             } catch (Exception e)
             {
                 Trace.WriteLine($"Failure restoring encrypted login data. Error: {e.Message}\n{e.InnerException?.Message ?? ""}");
+                // Meaning saved data is corrupted.
+                ClearLoginData();
             }
 
             return result;
+        }
+
+        private void ClearLoginData()
+        {
+            Properties.Settings.Default.username = null;
+            Properties.Settings.Default.password = null;
+            Properties.Settings.Default.Save();
         }
 
     }
