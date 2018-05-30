@@ -14,14 +14,24 @@ namespace Excel_VSTO_AddIn
 
     public class WbCustomPropsMngr
     {
+
+        #region Life Cycle
+
         public static WbCustomPropsMngr Instance { get; private set; } = new WbCustomPropsMngr();
 
-        private readonly string DOKKA_DOCUMENT_ID_KEY = "Dokka Document ID";
+        private static readonly string DOKKA_DOCUMENT_ID_KEY = "Dokka Document ID";
+        public static readonly string DOKKA_DEFAULT_DOCUMENT_ID = "Dokka Default Document ID";
 
         private WbCustomPropsMngr()
         {
             // NOP - just block default constructor.
         }
+
+        #endregion Life Cycle
+
+
+
+        #region Public Funcs
 
         public void SetDocumentIdForWb(Workbook Wb, string documentId)
         {
@@ -53,6 +63,12 @@ namespace Excel_VSTO_AddIn
 
             return docId;
         }
+
+        #endregion Public Funcs
+
+
+
+        #region Private
 
         private Microsoft.Office.Core.DocumentProperty GetCustomProperty(Workbook Wb, string KEY)
         {
@@ -90,5 +106,8 @@ namespace Excel_VSTO_AddIn
             var currProp = GetCustomProperty(Wb, KEY);
             if (currProp != null) currProp.Delete();
         }
+
+        #endregion Private
+
     }
 }

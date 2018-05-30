@@ -26,6 +26,7 @@ namespace Excel_VSTO_AddIn
         {
             public string Name { get; set; }
             public string NewName { get; set; }
+            public Microsoft.Office.Interop.Excel.Workbook Wb { get; set; }
         }
 
         private Upload _currentUpload = null;
@@ -63,6 +64,10 @@ namespace Excel_VSTO_AddIn
 
 
 
+        /// <summary>
+        /// Initiate the upload from the UI and not by the Save command hook.
+        /// </summary>
+        /// <param name="resetToken">If true, the system forgets about the login token supplied by the server. Will prompt new login.</param>
         public async void SendFileToDokka(bool resetToken = false)
         {
             Microsoft.Office.Interop.Excel.Workbook Wb = Application.ActiveWorkbook;
@@ -79,6 +84,10 @@ namespace Excel_VSTO_AddIn
             if (String.IsNullOrEmpty(Wb.Path))
             {
                 // Sending a file that hasn't been saved yet to local storage.
+
+                // Set the document ID to some default value so we know it's been uploaded to Dokka Before being saved.
+                WbCustomPropsMngr.Instance.SetDocumentIdForWb(Wb, WbCustomPropsMngr.DOKKA_DEFAULT_DOCUMENT_ID);
+
                 tempPath = System.IO.Path.GetTempPath();
                 //string[] parts = Wb.FullName.Split(".".ToCharArray());
                 string namepart = "noname";
@@ -111,7 +120,6 @@ namespace Excel_VSTO_AddIn
             } else
             {
                 Trace.WriteLine("Upload Aborted ....");
-                Application.StatusBar = "Cannot upload file to Dokka";
             }
         }
 
@@ -169,12 +177,16 @@ namespace Excel_VSTO_AddIn
         {
             Trace.WriteLine(" === Upload file process triggered === ");
 
-            var currPath = Wb.Path;
-            if (String.IsNullOrEmpty(currPath) && String.IsNullOrEmpty(tempFilePath))
+            if (String.IsNullOrEmpty(Wb.Path) && String.IsNullOrEmpty(tempFilePath))
             {
-                Trace.WriteLine("Ignoring save of new file");
+                // File is only in memory (New file, never saved)
+                if (WbCustomPropsMngr.Instance.GetDoucmentIdForWb(Wb) == null)
+                {
+                    // File is not managed by Dokka.
+                    Trace.WriteLine("Ignoring save of new file");
 
-                return null;
+                    return null;
+                }
             }
 
             if (validateDokkaSignature && !IsDokkaManagedFilename(Wb.Name))
@@ -195,7 +207,7 @@ namespace Excel_VSTO_AddIn
 
                 try
                 {
-                    await SendFileToServer(newName, fileName??name);
+                    await SendFileToServer(Wb, newName, fileName??name);
                 }
                 catch (Exception ex)
                 {
@@ -208,7 +220,14 @@ namespace Excel_VSTO_AddIn
             return task;
         }
 
-        private Task SendFileToServer(string newName, string name)
+        /// <summary>
+        /// Send the file to dokka async.
+        /// </summary>
+        /// <param name="Wb">The currently uploaded Workbook, not the copy uploaded</param>
+        /// <param name="newName">The full path to the copy saved for upload purposes</param>
+        /// <param name="name">The name of the file (no path) to be sent to the server in the file_name field..</param>
+        /// <returns>A Task uplpading the file. This task should be awaited / executed in order the upload to happen.</returns>
+        private Task SendFileToServer(Microsoft.Office.Interop.Excel.Workbook Wb, string newName, string name)
         {
             Task result;
             if (_currentUpload == null)
@@ -216,7 +235,8 @@ namespace Excel_VSTO_AddIn
                 _currentUpload = new Upload()
                 {
                     Name = name,
-                    NewName = newName
+                    NewName = newName,
+                    Wb = Wb
                 };
 
                 result = ServerInterface.Instance.UploadFileAtPath(newName, name, ShowLoginWrapper, UploadResultHandler);
@@ -254,8 +274,9 @@ namespace Excel_VSTO_AddIn
                             Trace.WriteLine("Upload detected, resuming upload after successful login");
                             var name = _currentUpload.Name;
                             var newName = _currentUpload.NewName;
+                            var wb = _currentUpload.Wb;
                             _currentUpload = null;
-                            var sendTask = SendFileToServer(newName, name);
+                            var sendTask = SendFileToServer(wb, newName, name);
                             sendTask.Wait();
                         }
                     }
@@ -269,9 +290,9 @@ namespace Excel_VSTO_AddIn
             });
         }
 
-        private void UploadResultHandler(string result, bool loginRequired)
+        private void UploadResultHandler(string result, bool loginRequired, string dokkaDocId)
         {
-            Trace.WriteLine($"Upload ended: {result}");
+            Trace.TraceInformation($"Upload ended: {result}");
 
             if (loginRequired)
             {
@@ -286,6 +307,7 @@ namespace Excel_VSTO_AddIn
 
                 if (_currentUpload != null)
                 {
+                    // Delete temp copy
                     var copyFilePath = _currentUpload.NewName;
                     try
                     {
@@ -293,12 +315,35 @@ namespace Excel_VSTO_AddIn
                     }
                     catch (Exception e)
                     {
-                        Trace.WriteLine($"Failure deleting file {copyFilePath}.\n{e.Message}\n{e.InnerException?.Message ?? ""}");
+                        Trace.TraceError($"Failure deleting file {copyFilePath}.\n{e.Message}\n{e.InnerException?.Message ?? ""}");
+                    }
+
+                    // Update Doc ID from dokka response
+                    if (dokkaDocId != null)
+                    {
+                        var wb = _currentUpload.Wb;
+                        var currDocId = WbCustomPropsMngr.Instance.GetDoucmentIdForWb(wb);
+                        if (String.IsNullOrEmpty(currDocId))
+                        {
+                            Trace.TraceInformation("Current Wb doc ID property is empty");
+                        } else if (currDocId.Equals(dokkaDocId))
+                        {
+                            Trace.TraceInformation("Document ID is in sync with Dokka cloud");
+                        } else if (currDocId.Equals(WbCustomPropsMngr.DOKKA_DEFAULT_DOCUMENT_ID))
+                        {
+                            Trace.TraceInformation("Updating Document ID to dokka supplied ID");
+                            WbCustomPropsMngr.Instance.SetDocumentIdForWb(wb, dokkaDocId);
+                        } else
+                        {
+                            Trace.TraceWarning($"Dokka document ID is different but not default. ID from server: {dokkaDocId}. ID in file: {currDocId}");
+                            Trace.TraceInformation("Updating document ID to newly sent ID from Dokka cloud");
+                            WbCustomPropsMngr.Instance.SetDocumentIdForWb(wb, dokkaDocId);
+                        }
                     }
                     _currentUpload = null;
                 } else
                 {
-                    Trace.WriteLine("WARNING: ** Current upload was NULL **");
+                    Trace.TraceWarning("WARNING: ** Current upload was NULL **");
                 }
             }
         }

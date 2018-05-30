@@ -40,7 +40,7 @@ namespace Excel_VSTO_AddIn
             }
         }
 
-        public async Task UploadFileAtPath(string filePath, string fileName, Action<string> showLoginFunc, Action<string, bool>uploadResultHandler)
+        public async Task UploadFileAtPath(string filePath, string fileName, Action<string> showLoginFunc, Action<string, bool, string>uploadResultHandler)
         {
             if (String.IsNullOrEmpty(DokkaServerToken))
             {
@@ -75,17 +75,18 @@ namespace Excel_VSTO_AddIn
                 response = await httpClient.PostAsync($"{_serverRoot}/uploadDocument?dokkaToken={DokkaServerToken}", form);
             } catch (Exception e)
             {
-                Trace.WriteLine($"Failure when attempting to upload file: {e.Message}\n{e.InnerException?.Message ?? ""}");
-                uploadResultHandler("Upload failure. Cannot reach Dokka cloud.", false);
+                Trace.TraceError($"Failure when attempting to upload file: {e.Message}\n{e.InnerException?.Message ?? ""}");
+                uploadResultHandler("Upload failure. Cannot reach Dokka cloud.", false, null);
 
                 return;
             }
 
-
+            string dokkaDocId = null;
+            string STUB_dokka_doc_id_STUB = $"temp_dokka_doc_id_{DateTime.Now.ToString("yyyy_MMM_dd__HH_mm__!@#$%^")}";
             if (response == null)
             {
                 Trace.WriteLine("Response is null. CHECK, this should not happen");
-                uploadResultHandler("Upload failure. Internal Dokka problem", false);
+                uploadResultHandler("Upload failure. Internal Dokka problem", false, null);
 
                 return;
             }
@@ -101,18 +102,20 @@ namespace Excel_VSTO_AddIn
                  * 
                  * */
                 Trace.WriteLine($"File {fileName} was successfully uloaded");
+                Trace.TraceWarning("Using a locally generated Doc ID stub");
+                dokkaDocId = STUB_dokka_doc_id_STUB;
             } else
             {
                 Trace.WriteLine($"There was an error when uploading file. CODE: {response.StatusCode}");
                 bool showLogin = (response.StatusCode == System.Net.HttpStatusCode.Unauthorized);
 
-                uploadResultHandler($"Upload to Dokka error. Error:{response.StatusCode}", showLogin);
+                uploadResultHandler($"Upload to Dokka error. Error:{response.StatusCode}", showLogin, null);
 
                 return;
             }
 
             var content = await response.Content.ReadAsStringAsync(); // check in the future if we want to implement a callback to the addin once upload is done / failed
-            uploadResultHandler(String.IsNullOrEmpty(content) ? "Upload to Dokka Done" : content, false);
+            uploadResultHandler(String.IsNullOrEmpty(content) ? "Upload to Dokka Done" : content, false, dokkaDocId);
         }
 
         public async Task LoginWithCredentials(string userIdentifier, string password, string companyIdentifier, Action<bool, string> loginCallback)

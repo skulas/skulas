@@ -64,6 +64,8 @@ FIXED 13.Save as opens the copy.
 	Attach document ID to metadata of file, for future save actions.
 	If user does Save-As, don't upload the file anymore and delete the meta data.
 	If this is a dokka managed file (detected through filename) save uploads to dokka + saves locally (current situation).
+	NOTE: There are corner cases that don't need to be covered right now.
+27. Setup environment in Google remote machine, so anybody can build it. Write instructions how to build this.
 
 File Format:
 Dokka#managed#file_mashebali_0123456789_configString
