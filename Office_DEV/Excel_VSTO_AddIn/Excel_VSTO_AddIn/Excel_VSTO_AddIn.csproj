@@ -201,6 +201,7 @@
     <Compile Include="UserControlLogin.Designer.cs">
       <DependentUpon>UserControlLogin.cs</DependentUpon>
     </Compile>
+    <Compile Include="WbCustomPropsMngr.cs" />
     <EmbeddedResource Include="DokkaRibbon.resx">
       <DependentUpon>DokkaRibbon.cs</DependentUpon>
     </EmbeddedResource>
@@ -217,7 +218,6 @@
       <DependentUpon>UserControlLogin.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="Excel_VSTO_AddIn.dll.config" />
     <None Include="Excel_VSTO_AddIn_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

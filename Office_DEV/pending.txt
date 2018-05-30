@@ -51,10 +51,13 @@ FIXED 13.Save as opens the copy.
 		FIXED: Ctrl + Click on Upload shows login again.
 20. When file is not yet saved. Check if the default name of the file can be set while still in the RAM, not saved locally.
 21. Expect from arik a different API for new file/vanilla file than for managed by Dokka file.
+	** NOTE: REMIND Arik if not supplied.
 22. Unsaved file: Add meta-data as long as there is not filename.
-23. Expecct from upload of vanilla file response with document ID.
-24. Make pwd field ***
-25. Amazone Code Build: Check if it can build the VSTO solution. Check if it also knows how to build the Distribtion setup.exe / *.vsto files.
+23. Expecct from upload of vanilla file response with document ID. 
+	** NOTE: REMIND Arik if not supplied.
+24. DONE: Make pwd field ***
+25. DONE: Amazone Code Build: Check if it can build the VSTO solution. Check if it also knows how to build the Distribtion setup.exe / *.vsto files.
+	https://aws.amazon.com/blogs/devops/extending-aws-codebuild-with-custom-build-environments-for-the-net-framework/
 26. Flow:
 	Create new file. Upload to Dokka (without saving locally). 
 	Ctrl+S / "Save File" doesn't save the file locally, it only uploads it to dokka again.
