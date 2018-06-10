@@ -36,7 +36,8 @@ FIXED 3. >>>> YES, upload after successful login: SHALL DO UPLOAD AFTER LOGIN?? 
 FIXED 7. Need to login again if Token expired.
 FIXED 8. Perist Token between Excel executions??
 9. Implement same for Word. MINIMAL boilerplate.
-10.Test alternatives to the saved copy path (currently doing in same folder as original document)
+10.Test alternatives to the saved copy path (currently doing in same folder as original document for file already saved on disk) 
+	(user TEMP folder for files in memroy only, not saved yet)
 FIXED 11.Should delete the copy created for upload.
 IT'S OK :: 12.Server is using stub with Dummy token for login. Need to define logic with Arik / Emil.
 FIXED 13.Save as opens the copy.
@@ -50,22 +51,25 @@ FIXED 13.Save as opens the copy.
 19. Changing company once logged in is impossible.
 		FIXED: Ctrl + Click on Upload shows login again.
 20. When file is not yet saved. Check if the default name of the file can be set while still in the RAM, not saved locally.
-21. Expect from arik a different API for new file/vanilla file than for managed by Dokka file.
-	** NOTE: REMIND Arik if not supplied.
-22. Unsaved file: Add meta-data as long as there is not filename.
-23. Expecct from upload of vanilla file response with document ID. 
-	** NOTE: REMIND Arik if not supplied.
-24. DONE: Make pwd field ***
-25. DONE: Amazone Code Build: Check if it can build the VSTO solution. Check if it also knows how to build the Distribtion setup.exe / *.vsto files.
+21. Upload File updated flow
+	1. Expect from arik a different API for new file/vanilla file than for managed by Dokka file.
+		** NOTE: REMIND Arik if not supplied.
+	2. Unsaved file: Add meta-data as long as there is not filename.
+	3. Expecct from upload of vanilla file response with document ID. 
+		** NOTE: REMIND Arik if not supplied.
+	4. Upload shall support accepting FileID in order to recognize updates to existing file vs new files.
+25. DONE: Make pwd field ***
+26. DONE: Amazone Code Build: Check if it can build the VSTO solution. Check if it also knows how to build the Distribtion setup.exe / *.vsto files.
 	https://aws.amazon.com/blogs/devops/extending-aws-codebuild-with-custom-build-environments-for-the-net-framework/
-26. Flow:
+27. Flow:
 	Create new file. Upload to Dokka (without saving locally). 
 	Ctrl+S / "Save File" doesn't save the file locally, it only uploads it to dokka again.
 	Attach document ID to metadata of file, for future save actions.
 	If user does Save-As, don't upload the file anymore and delete the meta data.
 	If this is a dokka managed file (detected through filename) save uploads to dokka + saves locally (current situation).
 	NOTE: There are corner cases that don't need to be covered right now.
-27. Setup environment in Google remote machine, so anybody can build it. Write instructions how to build this.
+28. Setup environment in Google remote machine, so anybody can build it. Write instructions how to build this.
+29. Having issues with Metadata, will get back to it after fixing issues with API in NORTH
 
 File Format:
 Dokka#managed#file_mashebali_0123456789_configString
