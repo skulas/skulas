@@ -70,10 +70,11 @@ namespace Excel_VSTO_AddIn
 
         #region Private
 
-        private Microsoft.Office.Core.DocumentProperty GetCustomProperty(Workbook Wb, string KEY)
+        private Microsoft.Office.Core.DocumentProperty GetCustomProperty(Microsoft.Office.Interop.Excel.Workbook Wb, string KEY)
         {
             Microsoft.Office.Core.DocumentProperty result = null;
-            Microsoft.Office.Core.DocumentProperties customProps = Wb.CustomDocumentProperties;
+            //Microsoft.Office.Core.DocumentProperties customProps = Wb.CustomDocumentProperties;
+            dynamic customProps = Wb.CustomDocumentProperties;
             try
             {
                 result = customProps[KEY];
@@ -93,7 +94,7 @@ namespace Excel_VSTO_AddIn
         /// <param name="value"></param>
         private void SetWbProperty(Workbook Wb, string KEY, string value)
         {
-            Microsoft.Office.Core.DocumentProperties customProps = Wb.CustomDocumentProperties;
+            dynamic customProps = Wb.CustomDocumentProperties;
 
             // Clear Current Value
             DeleteWbProperty(Wb, KEY);

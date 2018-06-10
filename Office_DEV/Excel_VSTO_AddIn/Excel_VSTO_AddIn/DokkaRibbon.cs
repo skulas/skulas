@@ -25,13 +25,13 @@ namespace Excel_VSTO_AddIn
         // Send from Home Tab
         private void BtnSaveToDokka_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.SendFileToDokka(ControlKeyIsDown);
+            Globals.ThisAddIn.SendFileToDokkaFromUI(ControlKeyIsDown);
         }
 
         // Send from File Tab
         private void BtnSaveToDokkaFromFile_Click(object sender, RibbonControlEventArgs e)
         {
-            Globals.ThisAddIn.SendFileToDokka(ControlKeyIsDown);
+            Globals.ThisAddIn.SendFileToDokkaFromUI(ControlKeyIsDown);
         }
     }
 }

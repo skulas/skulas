@@ -68,9 +68,12 @@ namespace Excel_VSTO_AddIn
         /// Initiate the upload from the UI and not by the Save command hook.
         /// </summary>
         /// <param name="resetToken">If true, the system forgets about the login token supplied by the server. Will prompt new login.</param>
-        public async void SendFileToDokka(bool resetToken = false)
+        /// <remarks>
+        /// When the file is being directly uploaded from RAM to Dokka, a temporary path is used instead the filename as it is saved on disk.
+        /// </remarks>
+        public async void SendFileToDokkaFromUI(bool resetToken = false)
         {
-            Microsoft.Office.Interop.Excel.Workbook Wb = Application.ActiveWorkbook;
+            Microsoft.Office.Interop.Excel.Workbook Wb = (Microsoft.Office.Interop.Excel.Workbook)Application.ActiveWorkbook;
             string tempPath = null;
             string filename = null;
 
@@ -103,7 +106,8 @@ namespace Excel_VSTO_AddIn
                 tempPath = $"{tempPath}{filename}";
             } else
             {
-                // file is in HD, don't upload if it's a dokka doc
+                // file is in HD, don't upload if it's a dokka doc.
+                // If it's a dokka managed document, it is uploaded uppon save.
                 if (IsDokkaManagedFilename(Wb.Name))
                 {
                     Trace.WriteLine($"The file {Wb.Name} is already managed by dokka, no need to upload it again");
@@ -141,15 +145,38 @@ namespace Excel_VSTO_AddIn
                 Trace.WriteLine("NOT UPLOADING THE FILE ..");
             }
 
+            if (WbCustomPropsMngr.Instance.GetDoucmentIdForWb(Wb) == null)
+            {
+                // File is not managed by dokka
+                // Regular save behaviour.
+                WriteWbToDisk(Wb);
+            }
+            else
+            {
+                if (String.IsNullOrEmpty(Wb.Path)) {
+                    // File hasn't been saved to disk, but it is managed by dokka.
+                    // Emulate the 'Upload to Dokka' Ribbon button.
+                    Trace.TraceInformation("File already managed by dokka, won't be saved locally");
+                    SendFileToDokkaFromUI();
+                } else
+                {
+                    // File already on disk and not managed by dokka, Vanilla, Save to disk
+                    WriteWbToDisk(Wb);
+                }
+            }
+        }
+
+        private void WriteWbToDisk(Microsoft.Office.Interop.Excel.Workbook Wb)
+        {
             Trace.WriteLine("SAVING FILE TO DISK by user save command.");
             try
             {
                 Wb.Save();
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Trace.WriteLine($"Error while saving, probably the user clicked cancel when saing a new file. Error: {e.Message}\n{e.InnerException?.Message ?? ""}");
             }
-            
         }
 
         #region VSTO generated code
@@ -267,7 +294,7 @@ namespace Excel_VSTO_AddIn
                     HideLogin();
                     if (!String.IsNullOrEmpty(responseStr))
                     {
-                        Properties.Settings.Default.loginToken = responseStr;
+                        DokkaOfficeAddinConfiguration.Instance.LoginToken = responseStr;
 
                         if (_currentUpload != null)
                         {
