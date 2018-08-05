@@ -1,0 +1,11 @@
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\bin\Debug\dokka_excel_addin.dll
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\bin\Debug\dokka_excel_addin.pdb
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\bin\Debug\dokka_excel_addin.dll.manifest
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\bin\Debug\dokka_excel_addin.vsto
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.dll
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\obj\Debug\dokka_excel_addin.Properties.Resources.resources
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\obj\Debug\dokka_excel_addin.csproj.GenerateResource.cache
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\obj\Debug\dokka_excel_addin.csproj.CoreCompileInputs.cache
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\obj\Debug\dokka_excel_addin.csproj.CopyComplete
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\obj\Debug\dokka_excel_addin.dll
+D:\DEV\Dokka\Office_addon\skulas\Office_DEV\Excel_VSTO_MVP_AddIn\dokka_excel_addin\obj\Debug\dokka_excel_addin.pdb

@@ -109,3 +109,8 @@ use token from first login
 t1Token: Token
 email: company.email9@foo.com
 
+
+Token for GIT on google machine:
+4b483c8dac924ba42d5827997c747200c66ad3a8
+
+
