@@ -12,16 +12,16 @@ namespace dokka_excel_addin
         public static DokkaConfig shared = new DokkaConfig();
 
         // NOTE: This regexp doesn't allow spaces in the filename. Fix needed if requirements allow space in filename.
-        private const string DOKKA_PREFIX = "Dokka#managed#file";
-        private string _filenameRegexPattern = $"^{DOKKA_PREFIX}_.*_{"[a-fA-F0-9]{10}"}_.*\\..*";
+        private string _filenameRegexPattern = Properties.Settings.Default.DokkaFilenamePat;
 
-        private const string CLIENT_PATH_PARAM = "3"; // 1 - iOS, 2 - Android, 3 - Web
-        public string ServerRoot => $"http://api-dev.dokka.biz/api/v2/{CLIENT_PATH_PARAM}";
+        public string ServerRoot => Properties.Settings.Default.UploadServer;
 
 
         public bool IsDokkaManagedFilename(string filename)
         {
-            var isDokkaFilename = Regex.IsMatch(filename, _filenameRegexPattern);
+            // There's no pattern in the name, for now. Regex.IsMatch(filename, _filenameRegexPattern);
+            // var isDokkaFilename = Regex.IsMatch(filename, _filenameRegexPattern);
+            var isDokkaFilename = true; 
 
             return isDokkaFilename;
         }

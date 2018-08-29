@@ -6,6 +6,11 @@ namespace dokka_excel_addin
 {
     public partial class ThisAddIn
     {
+        object _uploadInProgressLock = new object();
+        bool _uploadInProgressFlag = false;
+
+        int _clearStatusBarPID = 0;
+
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
             Application.WorkbookBeforeSave += new Microsoft.Office.Interop.Excel.AppEvents_WorkbookBeforeSaveEventHandler(Application_WorkbookBeforeSave);
@@ -35,6 +40,14 @@ namespace dokka_excel_addin
 
         private void Application_WorkbookBeforeSave(Microsoft.Office.Interop.Excel.Workbook Wb, bool SaveAsUI, ref bool Cancel)
         {
+            // File being uploaded, cannot change it while being uploaded.
+            if (_uploadInProgressFlag)
+            {
+                Trace.WriteLine("Upload in progress aborted save file");
+                ShowStatusMessage("File still being uploaded to Dokka. Cannot upload.");
+                Cancel = true;
+            }
+
             // File is only in memory (New file, never saved)
             if (String.IsNullOrEmpty(Wb.Path))
             {
@@ -61,28 +74,59 @@ namespace dokka_excel_addin
             {
                 Task.Delay(2000).Wait(); /// let save finish.
 
-                var wbPath = Wb.FullName;
                 var name = Wb.Name;
+                var newPath = $"{Wb.Path}\\dokkacopy___{name}";
+                // Need to save a copy as cannot upload the file that is in use by excel.
+                Wb.SaveCopyAs(newPath);
 
-                await DokkaOfficeUploader.shared.UploadFileAtPath(wbPath, name, (string message, string id) =>
+                await DokkaOfficeUploader.shared.UploadFileAtPath(newPath, name, (string message, string id) =>
                 {
+                    SetUploadFlag(false);
                     Trace.TraceInformation($"Upload ended: {message}");
 
                     if (String.IsNullOrEmpty(message))
                     {
-                        Application.StatusBar = "Upload aborted without reason";
+                        ShowStatusMessage("Upload aborted without reason");
                     }
                     else
                     {
-                        Application.StatusBar = message;
+                        ShowStatusMessage(message);
                     }
 
                 });
             });
 
+            SetUploadFlag(true);
             task.Start();
 
             return task;
+        }
+
+        private void SetUploadFlag(bool state)
+        {
+            lock (_uploadInProgressLock)
+            {
+                _uploadInProgressFlag = state;
+            }
+        }
+        
+        private void ShowStatusMessage(string msg)
+        {
+            Application.StatusBar = msg;
+            _clearStatusBarPID++;
+            Task.Run(() =>
+            {
+                Task.Delay(10000).Wait();
+                ClearStatus(_clearStatusBarPID);
+            });
+        }
+
+        private void ClearStatus(int pid)
+        {
+            if (_clearStatusBarPID == pid)
+            {
+                Application.StatusBar = "";
+            }
         }
 
         #endregion Dokka

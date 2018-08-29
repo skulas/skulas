@@ -1,7 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="dokka_excel_addin.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="UploadServer" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://api-dev.dokka.biz/api/v2/3</Value>
+    </Setting>
+    <Setting Name="DokkaFilenamePat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">^Dokka#managed#file_.*_[a-fA-F0-9]{10}_*</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

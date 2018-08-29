@@ -62,10 +62,21 @@ namespace dokka_excel_addin
             // Wrap bytearray in a POST request and send it.
             MultipartFormDataContent form = new MultipartFormDataContent();
             HttpResponseMessage response = null;
-            form.Add(byteArrayContent, "file", fileName);
             try
             {
-                response = await _httpClient.PostAsync($"{DokkaConfig.shared.ServerRoot}/uploadDocument?dokkaToken={@""}", form);
+                form.Add(byteArrayContent, "file", fileName);
+            } catch (Exception e)
+            {
+                Trace.TraceError($"Error when adding file to MultipartFormDataContent object: {e.Message}\n{e.InnerException?.Message ?? ""}");
+                uploadResultHandler("Upload failure. Cannot encode the file into a Dokka request.", null);
+
+                return;
+            }
+            
+            try
+            {
+                response = await _httpClient.PostAsync($"{DokkaConfig.shared.ServerRoot}/uploadDocumentVersion", form);
+                //response = await _httpClient.PostAsync($"{DokkaConfig.shared.ServerRoot}/uploadDocumentVersion?dokkaToken={@""}", form);
             }
             catch (Exception e)
             {
@@ -110,7 +121,7 @@ namespace dokka_excel_addin
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            uploadResultHandler(String.IsNullOrEmpty(content) ? "Upload to Dokka Done" : content, dokkaDocId);
+            uploadResultHandler(String.IsNullOrEmpty(content) ? "Upload to Dokka Done" : $"Upload to Dokka Done: {content}", dokkaDocId);
         }
 
         #endregion Public
