@@ -76,7 +76,6 @@ namespace dokka_excel_addin
             try
             {
                 response = await _httpClient.PostAsync($"{DokkaConfig.shared.ServerRoot}/uploadDocumentVersion", form);
-                //response = await _httpClient.PostAsync($"{DokkaConfig.shared.ServerRoot}/uploadDocumentVersion?dokkaToken={@""}", form);
             }
             catch (Exception e)
             {
@@ -113,15 +112,14 @@ namespace dokka_excel_addin
             else
             {
                 Trace.WriteLine($"There was an error when uploading file. CODE: {response.StatusCode}");
-                bool showLogin = (response.StatusCode == System.Net.HttpStatusCode.Unauthorized);
 
-                uploadResultHandler($"Upload to Dokka error. Error:{response.StatusCode}", null);
+                uploadResultHandler(null, null);
 
                 return;
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            uploadResultHandler(String.IsNullOrEmpty(content) ? "Upload to Dokka Done" : $"Upload to Dokka Done: {content}", dokkaDocId);
+            uploadResultHandler(String.IsNullOrEmpty(content) ? "Upload to Dokka Done" : $"Upload to Dokka: {content}", dokkaDocId);
         }
 
         #endregion Public

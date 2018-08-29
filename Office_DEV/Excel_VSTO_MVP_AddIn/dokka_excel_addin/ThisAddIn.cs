@@ -44,7 +44,7 @@ namespace dokka_excel_addin
             if (_uploadInProgressFlag)
             {
                 Trace.WriteLine("Upload in progress aborted save file");
-                ShowStatusMessage("File still being uploaded to Dokka. Cannot upload.");
+                ShowStatusMessage("File still being uploaded to Dokka. Cannot upload. FILE NOT SAVED.");
                 Cancel = true;
             }
 
@@ -86,7 +86,7 @@ namespace dokka_excel_addin
 
                     if (String.IsNullOrEmpty(message))
                     {
-                        ShowStatusMessage("Upload aborted without reason");
+                        ShowStatusMessage("File saved locally. Ignored by Dokka.");  // Upload aborted without reason");
                     }
                     else
                     {
