@@ -9,6 +9,8 @@ verify_ssl = true
 jupyter = "*"
 xgboost = "*"
 scikit-learn = "*"
+jupyter-contrib-nbextensions = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.7"
