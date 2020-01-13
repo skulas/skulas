@@ -11,6 +11,9 @@ xgboost = "*"
 scikit-learn = "*"
 jupyter-contrib-nbextensions = "*"
 pandas = "*"
+sqlalchemy = "*"
+pymysql = "*"
+bokeh = "*"
 
 [requires]
 python_version = "3.7"
