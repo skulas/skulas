@@ -7,13 +7,13 @@ verify_ssl = true
 
 [packages]
 jupyter = "*"
-xgboost = "*"
 scikit-learn = "*"
 jupyter-contrib-nbextensions = "*"
 pandas = "*"
 sqlalchemy = "*"
 pymysql = "*"
 bokeh = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.7"
